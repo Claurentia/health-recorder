@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 class WorkoutRecorder extends StatefulWidget {
   const WorkoutRecorder({super.key});
@@ -10,6 +11,10 @@ class WorkoutRecorder extends StatefulWidget {
 class _WorkoutRecorderState extends State<WorkoutRecorder> {
   String selectedExercise = "Running";
   final TextEditingController _durationController = TextEditingController();
+  List<WorkoutRecord> workoutRecords = [];
+
+  int caloriesBurnedToday = 0;
+  int averageCaloriesThisWeek = 0;
 
   static const List<String> exercises = [
     "Running",
@@ -22,22 +27,89 @@ class _WorkoutRecorderState extends State<WorkoutRecorder> {
     "Squat",
   ];
 
-  static List<Map<String, dynamic>> mockData = [
-    {"exercise": "Running", "duration": "30 minutes", "datetime": DateTime.now().subtract(const Duration(hours: 1))},
-    {"exercise": "Yoga", "duration": "45 minutes", "datetime": DateTime.now().subtract(const Duration(days: 1))},
-    {"exercise": "Cycling", "duration": "20 minutes", "datetime": DateTime.now().subtract(const Duration(days: 2))},
-    // ... other mock data, to be populated in the next app state management assignment
-  ];
+  @override
+  void initState() {
+    super.initState();
+    updateCalStats();
+  }
+
+  void updateCalStats() {
+    caloriesBurnedToday = calculateCaloriesBurnedToday();
+    averageCaloriesThisWeek = calculateAverageCaloriesThisWeek();
+    setState(() {});
+  }
+
+  int calculateCaloriesBurnedToday() {
+    DateTime now = DateTime.now();
+    DateTime today = DateTime(now.year, now.month, now.day);
+
+    int totalCalories = workoutRecords
+        .where((record) =>
+    record.dateTime.year == today.year &&
+        record.dateTime.month == today.month &&
+        record.dateTime.day == today.day)
+        .fold(0, (sum, record) => sum + record.caloriesBurned);
+
+    return totalCalories;
+  }
+
+  int calculateAverageCaloriesThisWeek() {
+    DateTime now = DateTime.now();
+    DateTime startOfWeek = now.subtract(Duration(days: now.weekday - 1));
+    startOfWeek = DateTime(startOfWeek.year, startOfWeek.month, startOfWeek.day);
+
+    var weekRecords = workoutRecords.where((record) =>
+    record.dateTime.isAfter(startOfWeek) && record.dateTime.isBefore(now));
+
+    if (weekRecords.isEmpty) return 0;
+
+    int totalCalories = weekRecords.fold(0, (sum, record) => sum + record.caloriesBurned);
+    int averageCalories = (totalCalories / weekRecords.length).toInt();
+
+    return averageCalories;
+  }
 
   void _onRecordTap(BuildContext context) {
     String workout = selectedExercise;
-    String duration = _durationController.text;
-    print('Log: Workout - $workout \t Duration - $duration');
+    int durationOrReps = int.tryParse(_durationController.text) ?? 0;
 
-    // add the new record to mock data - to do in next app state management assignment
+    int caloriesBurned = calculateCalories(workout, durationOrReps);
 
-    // Clear the duration text field after adding
+    recordExercise(workout, durationOrReps, caloriesBurned);
+
     _durationController.clear();
+    updateCalStats();
+  }
+
+  void recordExercise(String exercise, int durationOrReps, int calories) {
+    setState(() {
+      workoutRecords.insert(0, WorkoutRecord(exercise, durationOrReps, calories, DateTime.now()));
+    });
+  }
+
+  int calculateCalories(String exercise, int durationOrReps) {
+    switch (exercise) {
+      case "Running":
+        return durationOrReps * 8;
+      case "Cycling":
+        return durationOrReps * 6;
+      case "Swimming":
+        return durationOrReps * 10;
+      case "Yoga":
+        return durationOrReps * 4;
+      case "Bench Press":
+      case "Hammer Curl":
+      case "Roman Dead Lift":
+      case "Squat":
+        return durationOrReps * 2;
+      default:
+        return 0;
+    }
+  }
+
+  bool isDurationBasedExercise(String exercise) {
+    const durationBasedExercises = ["Running", "Cycling", "Swimming", "Yoga"];
+    return durationBasedExercises.contains(exercise);
   }
 
   @override
@@ -50,15 +122,18 @@ class _WorkoutRecorderState extends State<WorkoutRecorder> {
         backgroundColor: const Color(0xFFF5F5F5),
         appBar: AppBar(
           backgroundColor: const Color(0xFF333333),
-          title: const Text('Workout Recorder' ,
-            style: TextStyle(color: Colors.white),),
+          title: const Text(
+            'Workout Recorder',
+            style: TextStyle(color: Colors.white),
+          ),
         ),
-        body: SingleChildScrollView(
-          child: Padding(
+        body: ListView(
+          children: [
+            Padding(
             padding: const EdgeInsets.all(12.0),
-              child: Column(
+            child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
-              children: <Widget> [
+              children: <Widget>[
                 const SizedBox(height: 10),
                 Container(
                   width: double.infinity,
@@ -76,23 +151,23 @@ class _WorkoutRecorderState extends State<WorkoutRecorder> {
                       ),
                     ],
                   ),
-                  child: const Row(
+                  child: Row(
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
-                      SizedBox(width: 10),
-                      Icon(Icons.local_fire_department, color: Colors.white),
-                      SizedBox(width: 15),
-                      Expanded(
-                        child: Text('Calories Burned Yesterday',
+                      const SizedBox(width: 10),
+                      const Icon(Icons.local_fire_department, color: Colors.white),
+                      const SizedBox(width: 15),
+                      const Expanded(
+                        child: Text('Calories Burned Today',
                           style: TextStyle(fontSize: 18, color: Colors.white, fontWeight: FontWeight.bold),
                         ),
                       ),
-                      SizedBox(width: 15),
-                      Text('300 cal',
+                      const SizedBox(width: 15),
+                      Text('$caloriesBurnedToday cal',
                         textAlign: TextAlign.end,
-                        style: TextStyle(fontSize: 24, color: Colors.white),
+                        style: const TextStyle(fontSize: 24, color: Colors.white),
                       ),
-                      SizedBox(width: 10),
+                      const SizedBox(width: 10),
                     ],
                   ),
                 ),
@@ -111,27 +186,27 @@ class _WorkoutRecorderState extends State<WorkoutRecorder> {
                       ),
                     ],
                   ),
-                  child: const Row(
+                  child: Row(
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
-                      SizedBox(width: 10),
-                      Icon(Icons.trending_up, color: Colors.white),
-                      SizedBox(width: 15),
-                      Expanded(
+                      const SizedBox(width: 10),
+                      const Icon(Icons.trending_up, color: Colors.white),
+                      const SizedBox(width: 15),
+                      const Expanded(
                         child: Text('Avg. Calories Burned This Week',
                           style: TextStyle(fontSize: 18, color: Colors.white, fontWeight: FontWeight.bold),
                         ),
                       ),
-                      SizedBox(width: 15),
-                      Text('350 cal',
+                      const SizedBox(width: 15),
+                      Text('$averageCaloriesThisWeek cal',
                         textAlign: TextAlign.end,
-                        style: TextStyle(fontSize: 24, color: Colors.white),
+                        style: const TextStyle(fontSize: 24, color: Colors.white),
                       ),
-                      SizedBox(width: 10),
+                      const SizedBox(width: 10),
                     ],
                   ),
                 ),
-                const SizedBox(height: 20),
+                const SizedBox(height: 25),
                 const Text('Record Your Workout',
                   style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                 ),
@@ -156,56 +231,40 @@ class _WorkoutRecorderState extends State<WorkoutRecorder> {
                 TextField(
                   controller: _durationController,
                   keyboardType: TextInputType.number,
-                  decoration: const InputDecoration(
-                    border: OutlineInputBorder(),
-                    labelText: 'Duration (minutes)',
-                    hintText: 'Enter duration of workout',
+                  decoration: InputDecoration(
+                    border: const OutlineInputBorder(),
+                    labelText: isDurationBasedExercise(selectedExercise) ? 'Duration (minutes)' : 'Reps',
+                    hintText: isDurationBasedExercise(selectedExercise)
+                        ? 'Enter duration of workout'
+                        : 'Enter number of reps',
                   ),
                 ),
-                const SizedBox(height: 10),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    ElevatedButton(
-                      onPressed: () {
-                        // this button will add another set of text field to record workout record
-                        // to do in the next app state management assignment
-                        print('Tapped: button to add another workout set');
-                      },
-                      child: const Icon(Icons.add),
-                    ),
-                  ],
-                ),
+                const SizedBox(height: 20),
                 Center(
                   child: ElevatedButton(
                     onPressed: () => _onRecordTap(context),
                     child: const Text('Record Workout'),
                   ),
                 ),
-                const SizedBox(height: 30),
+                const SizedBox(height: 20),
+                const Divider(),
                 const Padding(
                   padding: EdgeInsets.all(10.0),
-                  child: Text('Workout History',
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold,),
-                  ),
-                ),
-                SizedBox(
-                  height: 160,
-                  child: ListView.builder(
-                    itemCount: mockData.length,
-                    itemBuilder: (context, index) {
-                      var item = mockData[index];
-                      return ListTile(
-                        leading: const Icon(Icons.fitness_center),
-                        title: Text("${item['exercise']} - ${item['duration']}"),
-                        subtitle: Text("Recorded on: ${item['datetime'].toString()}"),
-                      );
-                    },
+                  child: Text(
+                    'Workout History',
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                   ),
                 ),
               ],
             ),
-          ),
+            ),
+            for (var record in workoutRecords)
+              ListTile(
+                leading: const Icon(Icons.fitness_center),
+                title: Text(" ${record.workout} - ${record.durationOrReps} ${isDurationBasedExercise(record.workout) ? 'minutes' : 'reps'}"),
+                subtitle: Text(" Calories burned: ${record.caloriesBurned} cal \n Recorded at ${DateFormat('yyyy-MM-dd – kk:mm').format(record.dateTime)}"),
+              ),
+          ],
         ),
       ),
     );
@@ -216,4 +275,13 @@ class _WorkoutRecorderState extends State<WorkoutRecorder> {
     _durationController.dispose();
     super.dispose();
   }
+}
+
+class WorkoutRecord {
+  String workout;
+  int durationOrReps;
+  int caloriesBurned;
+  DateTime dateTime;
+
+  WorkoutRecord(this.workout, this.durationOrReps, this.caloriesBurned, this.dateTime);
 }
