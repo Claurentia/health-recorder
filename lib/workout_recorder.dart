@@ -13,7 +13,7 @@ class _WorkoutRecorderState extends State<WorkoutRecorder> {
   final TextEditingController _durationController = TextEditingController();
   List<WorkoutRecord> workoutRecords = [];
 
-  int caloriesBurnedYesterday = 0;
+  int caloriesBurnedToday = 0;
   int averageCaloriesThisWeek = 0;
 
   static const List<String> exercises = [
@@ -34,20 +34,20 @@ class _WorkoutRecorderState extends State<WorkoutRecorder> {
   }
 
   void updateCalStats() {
-    caloriesBurnedYesterday = calculateCaloriesBurnedYesterday();
+    caloriesBurnedToday = calculateCaloriesBurnedToday();
     averageCaloriesThisWeek = calculateAverageCaloriesThisWeek();
     setState(() {});
   }
 
-  int calculateCaloriesBurnedYesterday() {
+  int calculateCaloriesBurnedToday() {
     DateTime now = DateTime.now();
-    DateTime yesterday = DateTime(now.year, now.month, now.day).subtract(Duration(days: 1));
+    DateTime today = DateTime(now.year, now.month, now.day);
 
     int totalCalories = workoutRecords
         .where((record) =>
-    record.dateTime.year == yesterday.year &&
-        record.dateTime.month == yesterday.month &&
-        record.dateTime.day == yesterday.day)
+    record.dateTime.year == today.year &&
+        record.dateTime.month == today.month &&
+        record.dateTime.day == today.day)
         .fold(0, (sum, record) => sum + record.caloriesBurned);
 
     return totalCalories;
@@ -158,12 +158,12 @@ class _WorkoutRecorderState extends State<WorkoutRecorder> {
                       const Icon(Icons.local_fire_department, color: Colors.white),
                       const SizedBox(width: 15),
                       const Expanded(
-                        child: Text('Calories Burned Yesterday',
+                        child: Text('Calories Burned Today',
                           style: TextStyle(fontSize: 18, color: Colors.white, fontWeight: FontWeight.bold),
                         ),
                       ),
                       const SizedBox(width: 15),
-                      Text('$caloriesBurnedYesterday cal',
+                      Text('$caloriesBurnedToday cal',
                         textAlign: TextAlign.end,
                         style: const TextStyle(fontSize: 24, color: Colors.white),
                       ),
