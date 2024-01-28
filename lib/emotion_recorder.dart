@@ -178,6 +178,7 @@ class _EmotionRecorderState extends State<EmotionRecorder> {
           const SizedBox(height: 10,),
           Center(
             child: Text(selectedEmoji ?? 'Your mood today',
+              key: const Key('yourMoodTodayKey'),
               style: const TextStyle(fontSize: 24),
             ),
           ),
@@ -199,6 +200,7 @@ class _EmotionRecorderState extends State<EmotionRecorder> {
           ),
           Expanded(
             child: ListView.builder(
+              key: const Key('moodHistoryList'),
               itemCount: emojiRecords.length,
               itemBuilder: (context, index) {
                 EmojiRecord record = emojiRecords[index];
