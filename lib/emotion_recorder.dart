@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 class EmotionRecorder extends StatefulWidget {
   const EmotionRecorder({super.key});
@@ -9,6 +10,16 @@ class EmotionRecorder extends StatefulWidget {
 
 class _EmotionRecorderState extends State<EmotionRecorder> {
   String? selectedEmoji;
+  List<EmojiRecord> emojiRecords = [];
+
+  String pickedMoodYesterday = "No record";
+  String mostPickedMood = "No record";
+
+  @override
+  void initState() {
+    super.initState();
+    updateMoodSummary();
+  }
 
   static const List<String> emojis = [
     "😀", "😊", "😢", "🤢", "😎", "😡", "😐", "😰", "😴", "😕",
@@ -16,27 +27,12 @@ class _EmotionRecorderState extends State<EmotionRecorder> {
     "🤯", "😝", "🥳", "🤗"
   ];
 
-  static List<Map<String, dynamic>> mockData = [
-    {
-      "emoji": "😀",
-      "datetime": DateTime.now().subtract(const Duration(hours: 1))
-    },
-    {
-      "emoji": "😴",
-      "datetime": DateTime.now().subtract(const Duration(days: 1))
-    },
-    //... other mock data, to be populated in the next app state management assignment
-  ];
-
   void _onEmojiTap(BuildContext context, String emoji) {
-    // For now, show a simple snackbar and print on console on tap
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('You selected $emoji'),
-        duration: const Duration(seconds: 1),
-      ),
-    );
-    print('You selected $emoji');
+    setState(() {
+      selectedEmoji = emoji;
+      emojiRecords.insert(0, EmojiRecord(emoji, DateTime.now()));
+      updateMoodSummary();
+    });
   }
 
   void _showEmojiPicker() {
@@ -70,6 +66,49 @@ class _EmotionRecorderState extends State<EmotionRecorder> {
     );
   }
 
+  void updateMoodSummary() {
+    // Calculate the picked mood yesterday
+    DateTime now = DateTime.now();
+    DateTime yesterday = DateTime(now.year, now.month, now.day).subtract(Duration(days: 1));
+
+    List<EmojiRecord> yesterdayRecords = emojiRecords.where((record) {
+      return record.dateTime.year == yesterday.year &&
+          record.dateTime.month == yesterday.month &&
+          record.dateTime.day == yesterday.day;
+    }).toList();
+
+    if (yesterdayRecords.isNotEmpty) {
+      Map<String, int> moodFrequency = {};
+
+      for (var record in yesterdayRecords) {
+        moodFrequency[record.emoji] = (moodFrequency[record.emoji] ?? 0) + 1;
+      }
+
+      String mostFrequentMood = moodFrequency.entries
+          .reduce((a, b) => a.value > b.value ? a : b)
+          .key;
+
+      pickedMoodYesterday = mostFrequentMood;
+    } else {
+      pickedMoodYesterday = "No record";
+    }
+
+    // Calculate the most picked mood
+    Map<String, int> moodCount = {};
+
+    for (var record in emojiRecords) {
+      moodCount[record.emoji] = (moodCount[record.emoji] ?? 0) + 1;
+    }
+
+    if (moodCount.isNotEmpty) {
+      mostPickedMood = moodCount.entries
+          .reduce((a, b) => a.value > b.value ? a : b)
+          .key;
+    }
+
+    setState(() {});
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -93,13 +132,17 @@ class _EmotionRecorderState extends State<EmotionRecorder> {
                     color: Colors.indigo,
                     borderRadius: BorderRadius.circular(8),
                   ),
-                  child: const Column(
+                  child: Column(
                     children: [
-                      Text('Your Mood Yesterday',
+                      const Text('Your Mood Yesterday',
                           style: TextStyle(fontSize: 17, color: Colors.white, fontWeight: FontWeight.bold)),
-                      SizedBox(height: 5),
-                      Text('😴', style: TextStyle(fontSize: 24)),
-                      SizedBox(height: 5),
+                      const SizedBox(height: 5),
+                      Text(pickedMoodYesterday,
+                        style: TextStyle(
+                          fontSize: pickedMoodYesterday == "No record" ? 14 : 24,
+                          color: pickedMoodYesterday == "No record" ? Colors.white : Colors.black,),
+                      ),
+                      const SizedBox(height: 5),
                     ],
                   ),
                 ),
@@ -109,13 +152,17 @@ class _EmotionRecorderState extends State<EmotionRecorder> {
                     color: const Color(0xFF008080),
                     borderRadius: BorderRadius.circular(8),
                   ),
-                  child: const Column(
+                  child: Column(
                     children: [
-                      Text(' Most Picked Mood ',
+                      const Text(' Most Picked Mood ',
                           style: TextStyle(fontSize: 17, color: Colors.white, fontWeight: FontWeight.bold)),
-                      SizedBox(height: 5),
-                      Text('🙂', style: TextStyle(fontSize: 24)),
-                      SizedBox(height: 5),
+                      const SizedBox(height: 5),
+                      Text(mostPickedMood,
+                        style: TextStyle(
+                          fontSize: mostPickedMood == "No record" ? 14 : 24,
+                          color: mostPickedMood == "No record" ? Colors.white : Colors.black,),
+                      ),
+                      const SizedBox(height: 5),
                     ],
                   ),
                 ),
@@ -141,7 +188,9 @@ class _EmotionRecorderState extends State<EmotionRecorder> {
               child: const Text('Select Mood'),
             ),
           ),
-          const SizedBox(height: 50),
+          const SizedBox(height: 30),
+          const Divider(),
+          const SizedBox(height: 10),
           const Padding(
             padding: EdgeInsets.all(10.0),
             child: Text('History',
@@ -150,14 +199,14 @@ class _EmotionRecorderState extends State<EmotionRecorder> {
           ),
           Expanded(
             child: ListView.builder(
-              itemCount: mockData.length,
+              itemCount: emojiRecords.length,
               itemBuilder: (context, index) {
-                var item = mockData[index];
+                EmojiRecord record = emojiRecords[index];
                 return ListTile(
-                  leading: Text(item["emoji"],
-                    style: const TextStyle(fontSize: 24),
+                  leading: Text(record.emoji, style: TextStyle(fontSize: 24)),
+                  title: Text(
+                      'Selected on: ${DateFormat('yyyy-MM-dd – kk:mm').format(record.dateTime)}'
                   ),
-                  title: Text("Selected on: ${item["datetime"].toString()}"),
                 );
               },
             ),
@@ -166,4 +215,11 @@ class _EmotionRecorderState extends State<EmotionRecorder> {
       ),
     );
   }
+}
+
+class EmojiRecord {
+  String emoji;
+  DateTime dateTime;
+
+  EmojiRecord(this.emoji, this.dateTime);
 }
