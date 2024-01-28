@@ -11,7 +11,10 @@ class DietRecorder extends StatefulWidget {
 class _DietRecorderState extends State<DietRecorder> {
   final TextEditingController _itemController = TextEditingController();
   final TextEditingController _calController = TextEditingController();
+  String? selectedFoodItem;
+
   List<DietRecord> dietRecords = [];
+  Set<String> previousFoodItems = Set();
 
   int totalCaloriesToday = 0;
   int averageCaloriesThisWeek = 0;
@@ -59,16 +62,64 @@ class _DietRecorderState extends State<DietRecorder> {
   }
 
   void _onRecordTap(BuildContext context) {
+    if (_itemController.text.isEmpty || _calController.text.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Please fill in all fields'),
+          backgroundColor: Colors.red,
+        ),
+      );
+      return;
+    }
+
     String foodItem = _itemController.text;
     int calories = int.parse(_calController.text);
 
     setState(() {
       dietRecords.insert(0, DietRecord(foodItem, calories, DateTime.now()));
+      previousFoodItems.add(foodItem);
     });
 
     _itemController.clear();
     _calController.clear();
+    selectedFoodItem = null;
     updateCalStats();
+  }
+
+  Widget foodItemInput() {
+    return Row(
+      children: <Widget>[
+        Expanded(
+          child: TextField(
+            controller: _itemController,
+            decoration: const InputDecoration(
+              labelText: 'Food Item',
+              hintText: 'Enter food item',
+            ),
+          ),
+        ),
+        if (previousFoodItems.isNotEmpty)
+          DropdownButtonHideUnderline(
+            child: DropdownButton<String>(
+              isExpanded: false,
+              icon: const Icon(Icons.arrow_drop_down, size: 30),
+              onChanged: (String? newValue) {
+                if (newValue != null) {
+                  setState(() {
+                    _itemController.text = newValue;
+                  });
+                }
+              },
+              items: previousFoodItems.map<DropdownMenuItem<String>>((String value) {
+                return DropdownMenuItem<String>(
+                  value: value,
+                  child: Text(value),
+                );
+              }).toList(),
+            ),
+          ),
+      ],
+    );
   }
 
   @override
@@ -168,14 +219,7 @@ class _DietRecorderState extends State<DietRecorder> {
                         style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                       ),
                       const SizedBox(height: 10),
-                      TextField(
-                        controller: _itemController,
-                        decoration: InputDecoration(
-                          border: OutlineInputBorder(),
-                          labelText: 'Food Item',
-                          hintText: 'Enter what you ate',
-                        ),
-                      ),
+                      foodItemInput(),
                       const SizedBox(height: 10),
                       TextField(
                         controller: _calController,

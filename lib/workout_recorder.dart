@@ -70,6 +70,16 @@ class _WorkoutRecorderState extends State<WorkoutRecorder> {
   }
 
   void _onRecordTap(BuildContext context) {
+    if (_durationController.text.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Please fill in all fields'),
+          backgroundColor: Colors.red,
+        ),
+      );
+      return;
+    }
+
     String workout = selectedExercise;
     int durationOrReps = int.tryParse(_durationController.text) ?? 0;
 
