@@ -192,6 +192,7 @@ class _DietRecorderState extends State<DietRecorder> {
       )
     );
   }
+
   @override
   void dispose() {
     _itemController.dispose();
