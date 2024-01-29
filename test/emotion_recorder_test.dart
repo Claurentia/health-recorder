@@ -11,6 +11,7 @@ void main() {
     await tester.pumpAndSettle();
 
     await tester.tap(find.text('😀').first);
+    DateTime recordTime = DateTime.now();
     await tester.pumpAndSettle();
 
     expect(find.byKey(const Key('yourMoodTodayKey')), findsOneWidget);
@@ -18,7 +19,8 @@ void main() {
     final emojiListFinder = find.byKey(const Key('moodHistoryList'));
     expect(find.descendant(of: emojiListFinder, matching: find.text('😀')), findsOneWidget);
 
-    final RegExp dateTimeRegExp = RegExp(r'\d{4}-\d{2}-\d{2} – \d{2}:\d{2}');
-    expect(find.byWidgetPredicate((widget) => widget is Text && dateTimeRegExp.hasMatch(widget.data!)), findsWidgets);
+    String date = DateFormat('yyyy-MM-dd – kk:mm').format(recordTime);
+    expect(find.text('Selected on: $date'), findsOneWidget);
+
   });
 }

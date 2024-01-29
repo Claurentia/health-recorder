@@ -101,6 +101,7 @@ class _DietRecorderState extends State<DietRecorder> {
         if (previousFoodItems.isNotEmpty)
           DropdownButtonHideUnderline(
             child: DropdownButton<String>(
+              key: const Key('dropdown'),
               isExpanded: false,
               icon: const Icon(Icons.arrow_drop_down, size: 30),
               onChanged: (String? newValue) {
