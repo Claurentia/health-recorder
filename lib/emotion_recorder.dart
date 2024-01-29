@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
+import './recording_state_provider.dart';
 
 class EmotionRecorder extends StatefulWidget {
   const EmotionRecorder({super.key});
@@ -33,6 +35,7 @@ class _EmotionRecorderState extends State<EmotionRecorder> {
       emojiRecords.insert(0, EmojiRecord(emoji, DateTime.now()));
       updateMoodSummary();
     });
+    Provider.of<RecordingState>(context, listen: false).recordActivity();
   }
 
   void _showEmojiPicker() {
@@ -178,6 +181,7 @@ class _EmotionRecorderState extends State<EmotionRecorder> {
           const SizedBox(height: 10,),
           Center(
             child: Text(selectedEmoji ?? 'Your mood today',
+              key: const Key('yourMoodTodayKey'),
               style: const TextStyle(fontSize: 24),
             ),
           ),
@@ -199,6 +203,7 @@ class _EmotionRecorderState extends State<EmotionRecorder> {
           ),
           Expanded(
             child: ListView.builder(
+              key: const Key('moodHistoryList'),
               itemCount: emojiRecords.length,
               itemBuilder: (context, index) {
                 EmojiRecord record = emojiRecords[index];
