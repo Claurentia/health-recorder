@@ -1,10 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import './emotion_recorder.dart';
 import './diet_recorder.dart';
 import './workout_recorder.dart';
+import './recording_state_provider.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp(ChangeNotifierProvider(
+    create: (context) => RecordingState(),
+    child: const MyApp(),
+  ));
 }
 
 class MyApp extends StatelessWidget {
@@ -32,12 +37,13 @@ class HealthRecorder extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       body: PageView(
-        children: [
-          const EmotionRecorder(),
-          const DietRecorder(),
-          const WorkoutRecorder(),
+        children: const [
+          EmotionRecorder(),
+          DietRecorder(),
+          WorkoutRecorder(),
         ],
       ),
+      bottomNavigationBar: const RecordingStatusWidget(),
     );
   }
 }

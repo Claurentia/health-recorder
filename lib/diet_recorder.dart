@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
+import './recording_state_provider.dart';
 
 class DietRecorder extends StatefulWidget {
   const DietRecorder({super.key});
@@ -79,6 +81,7 @@ class _DietRecorderState extends State<DietRecorder> {
       dietRecords.insert(0, DietRecord(foodItem, calories, DateTime.now()));
       previousFoodItems.add(foodItem);
     });
+    Provider.of<RecordingState>(context, listen: false).recordActivity();
 
     _itemController.clear();
     _calController.clear();

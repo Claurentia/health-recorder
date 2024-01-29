@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
+import './recording_state_provider.dart';
 
 class WorkoutRecorder extends StatefulWidget {
   const WorkoutRecorder({super.key});
@@ -95,6 +97,7 @@ class _WorkoutRecorderState extends State<WorkoutRecorder> {
     setState(() {
       workoutRecords.insert(0, WorkoutRecord(exercise, durationOrReps, calories, DateTime.now()));
     });
+    Provider.of<RecordingState>(context, listen: false).recordActivity();
   }
 
   int calculateCalories(String exercise, int durationOrReps) {
