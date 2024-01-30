@@ -97,7 +97,7 @@ class _WorkoutRecorderState extends State<WorkoutRecorder> {
     setState(() {
       workoutRecords.insert(0, WorkoutRecord(exercise, durationOrReps, calories, DateTime.now()));
     });
-    Provider.of<RecordingState>(context, listen: false).recordActivity();
+    Provider.of<RecordingState>(context, listen: false).recordActivity('Workout');
   }
 
   int calculateCalories(String exercise, int durationOrReps) {
