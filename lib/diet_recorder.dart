@@ -81,7 +81,7 @@ class _DietRecorderState extends State<DietRecorder> {
       dietRecords.insert(0, DietRecord(foodItem, calories, DateTime.now()));
       previousFoodItems.add(foodItem);
     });
-    Provider.of<RecordingState>(context, listen: false).recordActivity();
+    Provider.of<RecordingState>(context, listen: false).recordActivity('Diet');
 
     _itemController.clear();
     _calController.clear();

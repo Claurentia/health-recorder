@@ -35,7 +35,7 @@ class _EmotionRecorderState extends State<EmotionRecorder> {
       emojiRecords.insert(0, EmojiRecord(emoji, DateTime.now()));
       updateMoodSummary();
     });
-    Provider.of<RecordingState>(context, listen: false).recordActivity();
+    Provider.of<RecordingState>(context, listen: false).recordActivity('Mood');
   }
 
   void _showEmojiPicker() {
@@ -197,7 +197,7 @@ class _EmotionRecorderState extends State<EmotionRecorder> {
           const SizedBox(height: 10),
           const Padding(
             padding: EdgeInsets.all(10.0),
-            child: Text('History',
+            child: Text('Mood History',
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
           ),
