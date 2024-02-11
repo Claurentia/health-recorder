@@ -4,16 +4,21 @@ import './emotion_recorder.dart';
 import './diet_recorder.dart';
 import './workout_recorder.dart';
 import './recording_state_provider.dart';
+import 'floor_model/recorder_database.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized(); // Ensure plugin services are initialized
+  RecorderDatabase database = await $FloorRecorderDatabase.databaseBuilder('app_database.db').build(); // Initialize the database
+
   runApp(ChangeNotifierProvider(
     create: (context) => RecordingState(),
-    child: const MyApp(),
+    child: MyApp(database), // Pass the database to MyApp
   ));
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  final RecorderDatabase database;
+  const MyApp(this.database, {super.key});
 
   // This widget is the root of your application.
   @override
