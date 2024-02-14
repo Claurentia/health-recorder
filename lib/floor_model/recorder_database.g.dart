@@ -130,7 +130,7 @@ class _$EmotionRecordDao extends EmotionRecordDao {
             (EmotionRecord item) => <String, Object?>{
                   'id': item.id,
                   'emoji': item.emoji,
-                  'dateTime': _dateTimeStringConverter.encode(item.dateTime),
+                  'dateTime': item.dateTime,
                   'points': item.points
                 }),
         _emotionRecordDeletionAdapter = DeletionAdapter(
@@ -140,7 +140,7 @@ class _$EmotionRecordDao extends EmotionRecordDao {
             (EmotionRecord item) => <String, Object?>{
                   'id': item.id,
                   'emoji': item.emoji,
-                  'dateTime': _dateTimeStringConverter.encode(item.dateTime),
+                  'dateTime': item.dateTime,
                   'points': item.points
                 });
 
@@ -160,8 +160,7 @@ class _$EmotionRecordDao extends EmotionRecordDao {
         mapper: (Map<String, Object?> row) => EmotionRecord(
             id: row['id'] as int?,
             emoji: row['emoji'] as String,
-            dateTime:
-                _dateTimeStringConverter.decode(row['dateTime'] as String),
+            dateTime: row['dateTime'] as String,
             points: row['points'] as int));
   }
 
@@ -189,7 +188,7 @@ class _$DietRecordDao extends DietRecordDao {
                   'id': item.id,
                   'foodItem': item.foodItem,
                   'calories': item.calories,
-                  'dateTime': _dateTimeStringConverter.encode(item.dateTime),
+                  'dateTime': item.dateTime,
                   'points': item.points
                 }),
         _dietRecordDeletionAdapter = DeletionAdapter(
@@ -200,7 +199,7 @@ class _$DietRecordDao extends DietRecordDao {
                   'id': item.id,
                   'foodItem': item.foodItem,
                   'calories': item.calories,
-                  'dateTime': _dateTimeStringConverter.encode(item.dateTime),
+                  'dateTime': item.dateTime,
                   'points': item.points
                 });
 
@@ -221,8 +220,7 @@ class _$DietRecordDao extends DietRecordDao {
             id: row['id'] as int?,
             foodItem: row['foodItem'] as String,
             calories: row['calories'] as int,
-            dateTime:
-                _dateTimeStringConverter.decode(row['dateTime'] as String),
+            dateTime: row['dateTime'] as String,
             points: row['points'] as int));
   }
 
@@ -261,7 +259,7 @@ class _$WorkoutRecordDao extends WorkoutRecordDao {
                   'workout': item.workout,
                   'durationOrReps': item.durationOrReps,
                   'caloriesBurned': item.caloriesBurned,
-                  'dateTime': _dateTimeStringConverter.encode(item.dateTime),
+                  'dateTime': item.dateTime,
                   'points': item.points
                 }),
         _workoutRecordDeletionAdapter = DeletionAdapter(
@@ -273,7 +271,7 @@ class _$WorkoutRecordDao extends WorkoutRecordDao {
                   'workout': item.workout,
                   'durationOrReps': item.durationOrReps,
                   'caloriesBurned': item.caloriesBurned,
-                  'dateTime': _dateTimeStringConverter.encode(item.dateTime),
+                  'dateTime': item.dateTime,
                   'points': item.points
                 });
 
@@ -295,8 +293,7 @@ class _$WorkoutRecordDao extends WorkoutRecordDao {
             workout: row['workout'] as String,
             durationOrReps: row['durationOrReps'] as int,
             caloriesBurned: row['caloriesBurned'] as int,
-            dateTime:
-                _dateTimeStringConverter.decode(row['dateTime'] as String),
+            dateTime: row['dateTime'] as String,
             points: row['points'] as int));
   }
 
@@ -311,6 +308,3 @@ class _$WorkoutRecordDao extends WorkoutRecordDao {
     await _workoutRecordDeletionAdapter.delete(workoutRecord);
   }
 }
-
-// ignore_for_file: unused_element
-final _dateTimeStringConverter = DateTimeStringConverter();

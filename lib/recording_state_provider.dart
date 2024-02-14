@@ -8,27 +8,29 @@ class RecordingState extends ChangeNotifier {
   String lastRecordingActivity = 'no record';
   int recordingPoints = 0;
 
-  void recordActivity(String activity) {
+  int recordActivity(String activity) {
     lastRecordingActivity = activity;
-    _calculatePoints();
+    int ptsEarned = _calculatePoints();
     notifyListeners();
+    return ptsEarned;
   }
 
-  void _calculatePoints() {
+  int _calculatePoints() {
     var now = DateTime.now();
+    int ptsEarned = 0;
     if (lastRecordingTime == null) {
       recordingPoints += 50;
+      ptsEarned += 50;
     } else {
       var hoursElapsed = now.difference(lastRecordingTime!).inHours + 1;
 
-      int pointsToAdd = 2 * min(hoursElapsed, 15);
-      recordingPoints += pointsToAdd;
+      ptsEarned = 2 * min(hoursElapsed, 15);
+      recordingPoints += ptsEarned;
     }
     lastRecordingTime = now;
+    return ptsEarned;
   }
-
 }
-
 
 class RecordingStatusWidget extends StatelessWidget {
   const RecordingStatusWidget({super.key});
