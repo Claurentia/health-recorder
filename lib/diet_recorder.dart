@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import './recording_state_provider.dart';
+import 'floor_model/recorder_database.dart';
+import 'floor_model/recorder_entity.dart';
 
 class DietRecorder extends StatefulWidget {
   const DietRecorder({super.key});
@@ -18,49 +20,19 @@ class _DietRecorderState extends State<DietRecorder> {
   List<DietRecord> dietRecords = [];
   Set<String> previousFoodItems = Set();
 
-  int totalCaloriesToday = 0;
-  int averageCaloriesThisWeek = 0;
-
   @override
   void initState() {
     super.initState();
-    updateCalStats();
+    _loadDietRecords();
   }
 
-  void updateCalStats() {
-    totalCaloriesToday = calculateCaloriesGainedToday();
-    averageCaloriesThisWeek = calculateAverageCaloriesThisWeek();
-    setState(() {});
-  }
-
-  int calculateCaloriesGainedToday() {
-    DateTime now = DateTime.now();
-    DateTime today = DateTime(now.year, now.month, now.day);
-
-    int totalCaloriesToday = dietRecords
-        .where((record) =>
-    record.dateTime.year == today.year &&
-        record.dateTime.month == today.month &&
-        record.dateTime.day == today.day)
-        .fold(0, (sum, record) => sum + record.calories);
-
-    return totalCaloriesToday;
-  }
-
-  int calculateAverageCaloriesThisWeek() {
-    DateTime now = DateTime.now();
-    DateTime startOfWeek = now.subtract(Duration(days: now.weekday - 1));
-    startOfWeek = DateTime(startOfWeek.year, startOfWeek.month, startOfWeek.day);
-
-    var weekRecords = dietRecords.where((record) =>
-    record.dateTime.isAfter(startOfWeek) && record.dateTime.isBefore(now));
-
-    if (weekRecords.isEmpty) return 0;
-
-    int totalCaloriesWeek = weekRecords.fold(0, (sum, record) => sum + record.calories);
-    int averageCaloriesWeek = (totalCaloriesWeek / weekRecords.length).toInt();
-
-    return averageCaloriesWeek;
+  void _loadDietRecords() async {
+    final database = Provider.of<RecorderDatabase>(context, listen: false);
+    final records = await database.dietRecordDao.findAllDietRecords();
+    setState(() {
+      dietRecords = List.from(records.reversed);
+      previousFoodItems = records.map((record) => record.foodItem).toSet();
+    });
   }
 
   void _onRecordTap(BuildContext context) {
@@ -74,19 +46,94 @@ class _DietRecorderState extends State<DietRecorder> {
       return;
     }
 
-    String foodItem = _itemController.text;
+    String foodItem = _itemController.text.toLowerCase();
     int calories = int.parse(_calController.text);
+    String now = DateFormat('yyyy-MM-dd – kk:mm').format(DateTime.now());
+    int ptsEarned = Provider.of<RecordingState>(context, listen: false).recordActivity('Diet');
 
-    setState(() {
-      dietRecords.insert(0, DietRecord(foodItem, calories, DateTime.now()));
-      previousFoodItems.add(foodItem);
-    });
-    Provider.of<RecordingState>(context, listen: false).recordActivity('Diet');
+    DietRecord newRecord = DietRecord(foodItem: foodItem, calories: calories, dateTime: now, points: ptsEarned);
 
+    recordDiet(newRecord);
+  }
+
+  void recordDiet(DietRecord newRecord) async {
+    final database = Provider.of<RecorderDatabase>(context, listen: false);
+    await database.dietRecordDao.insertDietRecord(newRecord);
+    _loadDietRecords();
     _itemController.clear();
     _calController.clear();
     selectedFoodItem = null;
-    updateCalStats();
+  }
+
+  void _deleteDietRecord(DietRecord record) async {
+    final database = Provider.of<RecorderDatabase>(context, listen: false);
+    await database.dietRecordDao.deleteDietRecord(record);
+    _loadDietRecords();
+  }
+  void _confirmDeleteDietRecord(DietRecord record) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text("Confirm Record"),
+          content: const Text("Are you sure you want to delete this diet record?"),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: const Text("Cancel"),
+            ),
+            TextButton(
+              onPressed: () {
+                _deleteDietRecord(record);
+                Navigator.of(context).pop();
+              },
+              child: const Text("Delete", style: TextStyle(color: Colors.red)),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _showEditCaloriesDialog(DietRecord record) {
+    final TextEditingController _editCalController = TextEditingController(text: record.calories.toString());
+
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text('Edit Calories for ${record.foodItem}'),
+          content: TextField(
+            controller: _editCalController,
+            keyboardType: TextInputType.number,
+            decoration: InputDecoration(
+              hintText: 'Enter new calorie amount',
+            ),
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: Text('Cancel'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            TextButton(
+              child: Text('Update'),
+              onPressed: () {
+                _updateDietRecordCalories(record, int.tryParse(_editCalController.text) ?? record.calories);
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _updateDietRecordCalories(DietRecord record, int newCalories) async {
+    final database = Provider.of<RecorderDatabase>(context, listen: false);
+    await database.dietRecordDao.updateDietRecordCalories(record.id!, newCalories);
+    _loadDietRecords();
   }
 
   Widget foodItemInput() {
@@ -147,78 +194,6 @@ class _DietRecorderState extends State<DietRecorder> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: <Widget>[
                       const SizedBox(height: 10),
-                      Container(
-                          width: double.infinity,
-                          padding: const EdgeInsets.all(8),
-                          margin: const EdgeInsets.only(bottom: 10),
-                          decoration: BoxDecoration(
-                            color: Colors.indigo,
-                            borderRadius: BorderRadius.circular(10),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.black.withOpacity(0.15),
-                                spreadRadius: 0,
-                                blurRadius: 10,
-                                offset: const Offset(0, 4),
-                              ),
-                            ],
-                          ),
-                          child: Row(
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
-                              const SizedBox(width: 10),
-                              const Icon(Icons.fastfood, color: Colors.white),
-                              const SizedBox(width: 15),
-                              const Expanded(
-                                child: Text('Total Calories Gained Today',
-                                  style: TextStyle(fontSize: 18, color: Colors.white, fontWeight: FontWeight.bold),
-                                ),
-                              ),
-                              const SizedBox(width: 15),
-                              Text('$totalCaloriesToday cal',
-                                textAlign: TextAlign.end,
-                                style: const TextStyle(fontSize: 24, color: Colors.white),
-                              ),
-                              const SizedBox(width: 10),
-                            ],
-                          ),
-                      ),
-                      Container(
-                          width: double.infinity,
-                          padding: const EdgeInsets.all(8),
-                          margin: const EdgeInsets.only(bottom: 10),
-                          decoration: BoxDecoration(
-                            color: const Color(0xFF008080),
-                            borderRadius: BorderRadius.circular(10),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.black.withOpacity(0.15),
-                                spreadRadius: 0,
-                                blurRadius: 10,
-                                offset: const Offset(0, 4),
-                              ),
-                            ],
-                          ),
-                          child: Row(
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
-                              const SizedBox(width: 10),
-                              const Icon(Icons.trending_up, color: Colors.white),
-                              const SizedBox(width: 15),
-                              const Expanded(
-                                child: Text('Avg. Calories Gained This Week',
-                                  style: TextStyle(fontSize: 18, color: Colors.white, fontWeight: FontWeight.bold),
-                                ),
-                              ),
-                              const SizedBox(width: 15),
-                              Text('$averageCaloriesThisWeek cal',
-                                style: const TextStyle(fontSize: 24, color: Colors.white),
-                              ),
-                              const SizedBox(width: 10),
-                            ],
-                          ),
-                      ),
-                      const SizedBox(height: 20),
                       const Text('What did you eat today?',
                         style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                       ),
@@ -254,8 +229,21 @@ class _DietRecorderState extends State<DietRecorder> {
               for (var record in dietRecords)
                 ListTile(
                   leading: const Icon(Icons.fastfood),
-                  title: Text(record.foodItem),
-                  subtitle: Text(" Calories: ${record.calories} cal \n Recorded at ${DateFormat('yyyy-MM-dd – kk:mm').format(record.dateTime)}"),
+                  title: Text(record.foodItem, style: TextStyle(fontSize: 16),),
+                  subtitle: Text(" Calories: ${record.calories} cal \n Recorded at ${record.dateTime}", style: TextStyle(fontSize: 12),),
+                  trailing: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      IconButton(
+                        icon: const Icon(Icons.edit, color: Colors.blue),
+                        onPressed: () => _showEditCaloriesDialog(record),
+                      ),
+                      IconButton(
+                        icon: const Icon(Icons.delete, color: Colors.red),
+                        onPressed: () => _confirmDeleteDietRecord(record),
+                      ),
+                    ],
+                  ),
                 ),
             ],
           ),
@@ -269,12 +257,4 @@ class _DietRecorderState extends State<DietRecorder> {
     _calController.dispose();
     super.dispose();
   }
-}
-
-class DietRecord {
-  String foodItem;
-  int calories;
-  DateTime dateTime;
-
-  DietRecord(this.foodItem, this.calories, this.dateTime);
 }
