@@ -16,9 +16,6 @@ class _EmotionRecorderState extends State<EmotionRecorder> {
   String? selectedEmoji;
   List<EmotionRecord> emojiRecords = [];
 
-  String pickedMoodYesterday = "No record";
-  String mostPickedMood = "No record";
-
   static const List<String> emojis = [
     "😀", "😊", "😢", "🤢", "😎", "😡", "😐", "😰", "😴", "😕",
     "🥰", "😍", "🤔", "😘", "😬", "😓", "😌", "🤐", "😶", "😜",
@@ -158,6 +155,7 @@ class _EmotionRecorderState extends State<EmotionRecorder> {
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          const SizedBox(height: 10),
           const Padding(
             padding: EdgeInsets.all(10.0),
             child: Text('How are you feeling today?',

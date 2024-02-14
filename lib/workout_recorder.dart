@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import './recording_state_provider.dart';
+import 'floor_model/recorder_database.dart';
+import 'floor_model/recorder_entity.dart';
 
 class WorkoutRecorder extends StatefulWidget {
   const WorkoutRecorder({super.key});
@@ -14,9 +16,6 @@ class _WorkoutRecorderState extends State<WorkoutRecorder> {
   String selectedExercise = "Running";
   final TextEditingController _durationController = TextEditingController();
   List<WorkoutRecord> workoutRecords = [];
-
-  int caloriesBurnedToday = 0;
-  int averageCaloriesThisWeek = 0;
 
   static const List<String> exercises = [
     "Running",
@@ -32,43 +31,15 @@ class _WorkoutRecorderState extends State<WorkoutRecorder> {
   @override
   void initState() {
     super.initState();
-    updateCalStats();
+    _loadWorkoutRecords();
   }
 
-  void updateCalStats() {
-    caloriesBurnedToday = calculateCaloriesBurnedToday();
-    averageCaloriesThisWeek = calculateAverageCaloriesThisWeek();
-    setState(() {});
-  }
-
-  int calculateCaloriesBurnedToday() {
-    DateTime now = DateTime.now();
-    DateTime today = DateTime(now.year, now.month, now.day);
-
-    int totalCalories = workoutRecords
-        .where((record) =>
-    record.dateTime.year == today.year &&
-        record.dateTime.month == today.month &&
-        record.dateTime.day == today.day)
-        .fold(0, (sum, record) => sum + record.caloriesBurned);
-
-    return totalCalories;
-  }
-
-  int calculateAverageCaloriesThisWeek() {
-    DateTime now = DateTime.now();
-    DateTime startOfWeek = now.subtract(Duration(days: now.weekday - 1));
-    startOfWeek = DateTime(startOfWeek.year, startOfWeek.month, startOfWeek.day);
-
-    var weekRecords = workoutRecords.where((record) =>
-    record.dateTime.isAfter(startOfWeek) && record.dateTime.isBefore(now));
-
-    if (weekRecords.isEmpty) return 0;
-
-    int totalCalories = weekRecords.fold(0, (sum, record) => sum + record.caloriesBurned);
-    int averageCalories = (totalCalories / weekRecords.length).toInt();
-
-    return averageCalories;
+  void _loadWorkoutRecords() async {
+    final database = Provider.of<RecorderDatabase>(context, listen: false);
+    final records = await database.workoutRecordDao.findAllWorkoutRecords();
+    setState(() {
+      workoutRecords = List.from(records.reversed);
+    });
   }
 
   void _onRecordTap(BuildContext context) {
@@ -84,20 +55,22 @@ class _WorkoutRecorderState extends State<WorkoutRecorder> {
 
     String workout = selectedExercise;
     int durationOrReps = int.tryParse(_durationController.text) ?? 0;
-
     int caloriesBurned = calculateCalories(workout, durationOrReps);
+    String now = DateFormat('yyyy-MM-dd – kk:mm').format(DateTime.now());
+    int ptsEarned = Provider.of<RecordingState>(context, listen: false).recordActivity('Workout');
 
-    recordExercise(workout, durationOrReps, caloriesBurned);
+    WorkoutRecord newRecord = WorkoutRecord(workout: workout, durationOrReps: durationOrReps, caloriesBurned: caloriesBurned, dateTime: now, points: ptsEarned);
 
-    _durationController.clear();
-    updateCalStats();
+    recordExercise(newRecord);
   }
 
-  void recordExercise(String exercise, int durationOrReps, int calories) {
+  void recordExercise(WorkoutRecord newRecord) async {
+    final database = Provider.of<RecorderDatabase>(context, listen: false);
+    await database.workoutRecordDao.insertWorkoutRecord(newRecord);
     setState(() {
-      workoutRecords.insert(0, WorkoutRecord(exercise, durationOrReps, calories, DateTime.now()));
+      workoutRecords.insert(0, newRecord);
     });
-    Provider.of<RecordingState>(context, listen: false).recordActivity('Workout');
+    _durationController.clear();
   }
 
   int calculateCalories(String exercise, int durationOrReps) {
@@ -118,6 +91,37 @@ class _WorkoutRecorderState extends State<WorkoutRecorder> {
       default:
         return 0;
     }
+  }
+
+  void _deleteWorkoutRecord(WorkoutRecord record) async {
+    final database = Provider.of<RecorderDatabase>(context, listen: false);
+    await database.workoutRecordDao.deleteWorkoutRecord(record);
+    _loadWorkoutRecords();
+  }
+
+  void _confirmDeleteWorkoutRecord(WorkoutRecord record) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text("Confirm Record"),
+          content: const Text("Are you sure you want to delete this workout record?"),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: const Text("Cancel"),
+            ),
+            TextButton(
+              onPressed: () {
+                _deleteWorkoutRecord(record);
+                Navigator.of(context).pop();
+              },
+              child: const Text("Delete", style: TextStyle(color: Colors.red)),
+            ),
+          ],
+        );
+      },
+    );
   }
 
   bool isDurationBasedExercise(String exercise) {
@@ -148,78 +152,6 @@ class _WorkoutRecorderState extends State<WorkoutRecorder> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
                 const SizedBox(height: 10),
-                Container(
-                  width: double.infinity,
-                  padding: const EdgeInsets.all(8),
-                  margin: const EdgeInsets.only(bottom: 10),
-                  decoration: BoxDecoration(
-                    color: Colors.indigo,
-                    borderRadius: BorderRadius.circular(10),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.15),
-                        spreadRadius: 0,
-                        blurRadius: 10,
-                        offset: const Offset(0, 4),
-                      ),
-                    ],
-                  ),
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      const SizedBox(width: 10),
-                      const Icon(Icons.local_fire_department, color: Colors.white),
-                      const SizedBox(width: 15),
-                      const Expanded(
-                        child: Text('Calories Burned Today',
-                          style: TextStyle(fontSize: 18, color: Colors.white, fontWeight: FontWeight.bold),
-                        ),
-                      ),
-                      const SizedBox(width: 15),
-                      Text('$caloriesBurnedToday cal',
-                        textAlign: TextAlign.end,
-                        style: const TextStyle(fontSize: 24, color: Colors.white),
-                      ),
-                      const SizedBox(width: 10),
-                    ],
-                  ),
-                ),
-                Container(
-                  width: double.infinity,
-                  padding: const EdgeInsets.all(8),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFF008080),
-                    borderRadius: BorderRadius.circular(10),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.15),
-                        spreadRadius: 0,
-                        blurRadius: 10,
-                        offset: const Offset(0, 4),
-                      ),
-                    ],
-                  ),
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      const SizedBox(width: 10),
-                      const Icon(Icons.trending_up, color: Colors.white),
-                      const SizedBox(width: 15),
-                      const Expanded(
-                        child: Text('Avg. Calories Burned This Week',
-                          style: TextStyle(fontSize: 18, color: Colors.white, fontWeight: FontWeight.bold),
-                        ),
-                      ),
-                      const SizedBox(width: 15),
-                      Text('$averageCaloriesThisWeek cal',
-                        textAlign: TextAlign.end,
-                        style: const TextStyle(fontSize: 24, color: Colors.white),
-                      ),
-                      const SizedBox(width: 10),
-                    ],
-                  ),
-                ),
-                const SizedBox(height: 25),
                 const Text('Record Your Workout',
                   style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                 ),
@@ -275,7 +207,11 @@ class _WorkoutRecorderState extends State<WorkoutRecorder> {
               ListTile(
                 leading: const Icon(Icons.fitness_center),
                 title: Text(" ${record.workout} - ${record.durationOrReps} ${isDurationBasedExercise(record.workout) ? 'minutes' : 'reps'}"),
-                subtitle: Text(" Calories burned: ${record.caloriesBurned} cal \n Recorded at ${DateFormat('yyyy-MM-dd – kk:mm').format(record.dateTime)}"),
+                subtitle: Text(" Calories burned: ${record.caloriesBurned} cal \n Recorded at ${record.dateTime}"),
+                trailing: IconButton(
+                  icon: const Icon(Icons.delete, color: Colors.red),
+                  onPressed: () => _confirmDeleteWorkoutRecord(record),
+                ),
               ),
           ],
         ),
@@ -288,13 +224,4 @@ class _WorkoutRecorderState extends State<WorkoutRecorder> {
     _durationController.dispose();
     super.dispose();
   }
-}
-
-class WorkoutRecord {
-  String workout;
-  int durationOrReps;
-  int caloriesBurned;
-  DateTime dateTime;
-
-  WorkoutRecord(this.workout, this.durationOrReps, this.caloriesBurned, this.dateTime);
 }
