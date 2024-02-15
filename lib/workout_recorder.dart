@@ -137,13 +137,6 @@ class _WorkoutRecorderState extends State<WorkoutRecorder> {
         },
       child: Scaffold(
         backgroundColor: const Color(0xFFF5F5F5),
-        appBar: AppBar(
-          backgroundColor: const Color(0xFF333333),
-          title: const Text(
-            'Workout Recorder',
-            style: TextStyle(color: Colors.white),
-          ),
-        ),
         body: ListView(
           children: [
             Padding(
@@ -206,8 +199,8 @@ class _WorkoutRecorderState extends State<WorkoutRecorder> {
             for (var record in workoutRecords)
               ListTile(
                 leading: const Icon(Icons.fitness_center),
-                title: Text(" ${record.workout} - ${record.durationOrReps} ${isDurationBasedExercise(record.workout) ? 'minutes' : 'reps'}"),
-                subtitle: Text(" Calories burned: ${record.caloriesBurned} cal \n Recorded at ${record.dateTime}"),
+                title: Text(" ${record.workout} - ${record.durationOrReps} ${isDurationBasedExercise(record.workout) ? 'minutes' : 'reps'}", style: TextStyle(fontSize: 16),),
+                subtitle: Text(" Calories burned: ${record.caloriesBurned} cal \n Recorded at ${record.dateTime}", style: TextStyle(fontSize: 12),),
                 trailing: IconButton(
                   icon: const Icon(Icons.delete, color: Colors.red),
                   onPressed: () => _confirmDeleteWorkoutRecord(record),

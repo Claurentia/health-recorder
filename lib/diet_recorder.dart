@@ -96,31 +96,31 @@ class _DietRecorderState extends State<DietRecorder> {
   }
 
   void _showEditCaloriesDialog(DietRecord record) {
-    final TextEditingController _editCalController = TextEditingController(text: record.calories.toString());
+    final TextEditingController editCalController = TextEditingController(text: record.calories.toString());
 
     showDialog(
       context: context,
       builder: (context) {
         return AlertDialog(
-          title: Text('Edit Calories for ${record.foodItem}'),
+          title: const Text('Edit Calories Entry'),
           content: TextField(
-            controller: _editCalController,
+            controller: editCalController,
             keyboardType: TextInputType.number,
-            decoration: InputDecoration(
+            decoration: const InputDecoration(
               hintText: 'Enter new calorie amount',
             ),
           ),
           actions: <Widget>[
             TextButton(
-              child: Text('Cancel'),
+              child: const Text('Cancel'),
               onPressed: () {
                 Navigator.of(context).pop();
               },
             ),
             TextButton(
-              child: Text('Update'),
+              child: const Text('Update'),
               onPressed: () {
-                _updateDietRecordCalories(record, int.tryParse(_editCalController.text) ?? record.calories);
+                _updateDietRecordCalories(record, int.tryParse(editCalController.text) ?? record.calories);
                 Navigator.of(context).pop();
               },
             ),
@@ -181,11 +181,6 @@ class _DietRecorderState extends State<DietRecorder> {
           },
         child: Scaffold(
           backgroundColor: const Color(0xFFF5F5F5),
-          appBar: AppBar(
-            backgroundColor: const Color(0xFF333333),
-            title: const Text('Diet Recorder',
-              style: TextStyle(color: Colors.white),),
-          ),
           body: ListView(
             children: [
               Padding(

@@ -147,11 +147,6 @@ class _EmotionRecorderState extends State<EmotionRecorder> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFFF5F5F5),
-      appBar: AppBar(
-        backgroundColor: const Color(0xFF333333),
-        title: const Text('Emotion Recorder',
-          style: TextStyle(color: Colors.white),),
-      ),
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [

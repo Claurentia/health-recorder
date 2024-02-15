@@ -46,59 +46,59 @@ class RecordingStatusWidget extends StatelessWidget {
     int nextLevelPoints = ((recordingState.recordingPoints ~/ 100) + 1) * 100;
     int pointsToNextLevel = nextLevelPoints - recordingState.recordingPoints;
 
-    return BottomAppBar(
-      color: Colors.blueGrey,
-      child: Padding(
-        padding: EdgeInsets.zero,
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                Icon(Icons.access_time, color: Colors.white),
-                SizedBox(width: 8),
-                Flexible(
-                  child: Text(
-                    'Last Record: $lastRecord',
-                    style: TextStyle(color: Colors.white),
-                    overflow: TextOverflow.ellipsis,
+    return Container(
+        color: Colors.blueGrey, // Background color
+        child: Padding(
+          padding: EdgeInsets.all(8.0),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  Icon(Icons.access_time, size: 18, color: Colors.white),
+                  SizedBox(width: 8),
+                  Flexible(
+                    child: Text(
+                      'Last Record: $lastRecord',
+                      style: TextStyle(fontSize: 12, color: Colors.white),
+                      overflow: TextOverflow.ellipsis,
+                    ),
                   ),
-                ),
-              ],
-            ),
-            SizedBox(height: 4),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(Icons.star, color: Colors.white),
-                    SizedBox(width: 8),
-                    Text(
-                      'Dedication Level: $dedicationLevel',
-                      style: TextStyle(color: Colors.white),
-                    ),
-                  ],
-                ),
-                Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(Icons.trending_up, color: Colors.white),
-                    SizedBox(width: 8),
-                    Text(
-                      'Next Level: $pointsToNextLevel pts',
-                      style: TextStyle(color: Colors.white),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ],
+                ],
+              ),
+              SizedBox(height: 4),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(Icons.star, size: 18, color: Colors.white),
+                      SizedBox(width: 8),
+                      Text(
+                        'Dedication Level: $dedicationLevel',
+                        style: TextStyle(fontSize: 12, color: Colors.white),
+                      ),
+                    ],
+                  ),
+                  Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(Icons.trending_up, size: 18, color: Colors.white),
+                      SizedBox(width: 8),
+                      Text(
+                        'Next Level: $pointsToNextLevel pts ',
+                        style: TextStyle(fontSize: 12, color: Colors.white),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ],
+          ),
         ),
-      ),
     );
   }
 }
