@@ -2,11 +2,55 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'dart:math';
+import 'floor_model/recorder_database.dart';
+import 'floor_model/recorder_entity.dart';
 
 class RecordingState extends ChangeNotifier {
+  final RecorderDatabase database;
   DateTime? lastRecordingTime;
   String lastRecordingActivity = 'no record';
   int recordingPoints = 0;
+
+  RecordingState({required this.database});
+
+  Future<void> updatePointsAndLastActivity() async {
+    final int emotionPoints = await database.emotionRecordDao.getSumOfPoints() ?? 0;
+    final int dietPoints = await database.dietRecordDao.getSumOfPoints() ?? 0;
+    final int workoutPoints = await database.workoutRecordDao.getSumOfPoints() ?? 0;
+
+    recordingPoints = emotionPoints + dietPoints + workoutPoints;
+
+    final EmotionRecord? lastEmotionRecord = await database.emotionRecordDao.getLastInsertedRecord();
+    final DietRecord? lastDietRecord = await database.dietRecordDao.getLastInsertedRecord();
+    final WorkoutRecord? lastWorkoutRecord = await database.workoutRecordDao.getLastInsertedRecord();
+
+    DateFormat format = DateFormat('yyyy-MM-dd – kk:mm');
+    List<MapEntry<String, DateTime>> activityDatePairs = [];
+
+    if (lastEmotionRecord != null) {
+      activityDatePairs.add(MapEntry('Mood', format.parse(lastEmotionRecord.dateTime)));
+    }
+    if (lastDietRecord != null) {
+      activityDatePairs.add(MapEntry('Diet', format.parse(lastDietRecord.dateTime)));
+    }
+    if (lastWorkoutRecord != null) {
+      activityDatePairs.add(MapEntry('Workout', format.parse(lastWorkoutRecord.dateTime)));
+    }
+
+    activityDatePairs.sort((a, b) => b.value.compareTo(a.value));
+
+    if (activityDatePairs.isNotEmpty) {
+      final mostRecentActivity = activityDatePairs.first;
+      lastRecordingTime = mostRecentActivity.value;
+      lastRecordingActivity = mostRecentActivity.key;
+    }
+
+    notifyListeners();
+  }
+
+  void deductPoints() {
+    updatePointsAndLastActivity();
+  }
 
   int recordActivity(String activity) {
     lastRecordingActivity = activity;

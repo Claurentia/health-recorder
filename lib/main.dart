@@ -13,7 +13,7 @@ void main() async {
 
   runApp(MultiProvider(
     providers: [
-      ChangeNotifierProvider(create: (context) => RecordingState()),
+      ChangeNotifierProvider(create: (context) => RecordingState(database: database)),
       Provider(create: (context) => database),
     ],
     child: const MyApp(),
@@ -71,6 +71,15 @@ class HealthRecorder extends StatefulWidget {
 
 class _HealthRecorderState extends State<HealthRecorder> {
   int _selectedIndex = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final recordingState = Provider.of<RecordingState>(context, listen: false);
+      recordingState.updatePointsAndLastActivity();
+    });
+  }
   
   @override
   Widget build(BuildContext context) {
