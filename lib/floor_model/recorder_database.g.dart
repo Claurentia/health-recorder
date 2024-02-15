@@ -165,6 +165,23 @@ class _$EmotionRecordDao extends EmotionRecordDao {
   }
 
   @override
+  Future<int?> getSumOfPoints() async {
+    return _queryAdapter.query('SELECT SUM(points) FROM emotionRecords',
+        mapper: (Map<String, Object?> row) => row.values.first as int);
+  }
+
+  @override
+  Future<EmotionRecord?> getLastInsertedRecord() async {
+    return _queryAdapter.query(
+        'SELECT * FROM emotionRecords ORDER BY id DESC LIMIT 1',
+        mapper: (Map<String, Object?> row) => EmotionRecord(
+            id: row['id'] as int?,
+            emoji: row['emoji'] as String,
+            dateTime: row['dateTime'] as String,
+            points: row['points'] as int));
+  }
+
+  @override
   Future<void> insertEmotionRecord(EmotionRecord emotionRecord) async {
     await _emotionRecordInsertionAdapter.insert(
         emotionRecord, OnConflictStrategy.abort);
@@ -235,6 +252,24 @@ class _$DietRecordDao extends DietRecordDao {
   }
 
   @override
+  Future<int?> getSumOfPoints() async {
+    return _queryAdapter.query('SELECT SUM(points) FROM dietRecords',
+        mapper: (Map<String, Object?> row) => row.values.first as int);
+  }
+
+  @override
+  Future<DietRecord?> getLastInsertedRecord() async {
+    return _queryAdapter.query(
+        'SELECT * FROM dietRecords ORDER BY id DESC LIMIT 1',
+        mapper: (Map<String, Object?> row) => DietRecord(
+            id: row['id'] as int?,
+            foodItem: row['foodItem'] as String,
+            calories: row['calories'] as int,
+            dateTime: row['dateTime'] as String,
+            points: row['points'] as int));
+  }
+
+  @override
   Future<void> insertDietRecord(DietRecord dietRecord) async {
     await _dietRecordInsertionAdapter.insert(
         dietRecord, OnConflictStrategy.abort);
@@ -288,6 +323,25 @@ class _$WorkoutRecordDao extends WorkoutRecordDao {
   @override
   Future<List<WorkoutRecord>> findAllWorkoutRecords() async {
     return _queryAdapter.queryList('SELECT * FROM workoutRecords',
+        mapper: (Map<String, Object?> row) => WorkoutRecord(
+            id: row['id'] as int?,
+            workout: row['workout'] as String,
+            durationOrReps: row['durationOrReps'] as int,
+            caloriesBurned: row['caloriesBurned'] as int,
+            dateTime: row['dateTime'] as String,
+            points: row['points'] as int));
+  }
+
+  @override
+  Future<int?> getSumOfPoints() async {
+    return _queryAdapter.query('SELECT SUM(points) FROM workoutRecords',
+        mapper: (Map<String, Object?> row) => row.values.first as int);
+  }
+
+  @override
+  Future<WorkoutRecord?> getLastInsertedRecord() async {
+    return _queryAdapter.query(
+        'SELECT * FROM workoutRecords ORDER BY id DESC LIMIT 1',
         mapper: (Map<String, Object?> row) => WorkoutRecord(
             id: row['id'] as int?,
             workout: row['workout'] as String,

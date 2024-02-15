@@ -37,22 +37,28 @@ class _EmotionRecorderState extends State<EmotionRecorder> {
     _loadSelectedEmoji();
   }
 
-  void _loadSelectedEmoji() {
+  Future<void> _loadSelectedEmoji() async {
     final dateFormat = DateFormat('yyyy-MM-dd');
     final todayStr = dateFormat.format(DateTime.now());
 
-    final todayRecords = emojiRecords.where((record) {
-      final recordDateStr = record.dateTime.split(' – ')[0];
-      return recordDateStr == todayStr;
-    }).toList();
+    final database = Provider.of<RecorderDatabase>(context, listen: false);
+    final lastRecord = await database.emotionRecordDao.getLastInsertedRecord();
 
-    todayRecords.sort((a, b) => b.dateTime.compareTo(a.dateTime));
-
-    if (todayRecords.isNotEmpty) {
-      setState(() {
-        selectedEmoji = todayRecords.last.emoji;
-      });
+    String newSelectedEmoji;
+    if (lastRecord != null) {
+      final recordDateStr = lastRecord.dateTime.split(' – ')[0];
+      if (recordDateStr == todayStr) {
+        newSelectedEmoji = lastRecord.emoji;
+      } else {
+        newSelectedEmoji = "Today's Mood";
+      }
+    } else {
+      newSelectedEmoji = "Today's Mood";
     }
+
+    setState(() {
+      selectedEmoji = newSelectedEmoji;
+    });
   }
 
   void _onEmojiTap(BuildContext context, String emoji) {
