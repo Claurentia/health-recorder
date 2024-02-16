@@ -89,7 +89,7 @@ class _EmotionRecorderState extends State<EmotionRecorder> {
       emojiRecords.removeAt(selectedIndex);
       _loadSelectedEmoji();
     });
-    Provider.of<RecordingState>(context, listen: false).deductPoints();
+    Provider.of<RecordingState>(context, listen: false).deductPoints(record.points);
   }
 
   void _deleteRecordConfirmation(EmotionRecord record, int index) {

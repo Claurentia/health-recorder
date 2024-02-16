@@ -12,7 +12,7 @@ abstract class EmotionRecordDao {
   @delete
   Future<void> deleteEmotionRecord(EmotionRecord emotionRecord);
 
-  @Query('SELECT SUM(points) FROM emotionRecords')
+  @Query('SELECT COALESCE(SUM(points), 0) FROM emotionRecords')
   Future<int?> getSumOfPoints();
 
   @Query('SELECT * FROM emotionRecords ORDER BY id DESC LIMIT 1')
@@ -33,7 +33,7 @@ abstract class DietRecordDao {
   @delete
   Future<void> deleteDietRecord(DietRecord dietRecord);
 
-  @Query('SELECT SUM(points) FROM dietRecords')
+  @Query('SELECT COALESCE(SUM(points), 0) FROM dietRecords')
   Future<int?> getSumOfPoints();
 
   @Query('SELECT * FROM dietRecords ORDER BY id DESC LIMIT 1')
@@ -51,7 +51,7 @@ abstract class WorkoutRecordDao {
   @delete
   Future<void> deleteWorkoutRecord(WorkoutRecord workoutRecord);
 
-  @Query('SELECT SUM(points) FROM workoutRecords')
+  @Query('SELECT COALESCE(SUM(points), 0) FROM workoutRecords')
   Future<int?> getSumOfPoints();
 
   @Query('SELECT * FROM workoutRecords ORDER BY id DESC LIMIT 1')

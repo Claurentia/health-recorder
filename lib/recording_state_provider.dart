@@ -48,8 +48,9 @@ class RecordingState extends ChangeNotifier {
     notifyListeners();
   }
 
-  void deductPoints() {
-    updatePointsAndLastActivity();
+  void deductPoints(int points) {
+    recordingPoints -= points;
+    notifyListeners();
   }
 
   int recordActivity(String activity) {

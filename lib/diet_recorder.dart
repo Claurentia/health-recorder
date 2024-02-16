@@ -68,7 +68,7 @@ class _DietRecorderState extends State<DietRecorder> {
   void _deleteDietRecord(DietRecord record) async {
     final database = Provider.of<RecorderDatabase>(context, listen: false);
     await database.dietRecordDao.deleteDietRecord(record);
-    Provider.of<RecordingState>(context, listen: false).deductPoints();
+    Provider.of<RecordingState>(context, listen: false).deductPoints(record.points);
     _loadDietRecords();
   }
 

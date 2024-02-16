@@ -166,7 +166,8 @@ class _$EmotionRecordDao extends EmotionRecordDao {
 
   @override
   Future<int?> getSumOfPoints() async {
-    return _queryAdapter.query('SELECT SUM(points) FROM emotionRecords',
+    return _queryAdapter.query(
+        'SELECT COALESCE(SUM(points), 0) FROM emotionRecords',
         mapper: (Map<String, Object?> row) => row.values.first as int);
   }
 
@@ -253,7 +254,8 @@ class _$DietRecordDao extends DietRecordDao {
 
   @override
   Future<int?> getSumOfPoints() async {
-    return _queryAdapter.query('SELECT SUM(points) FROM dietRecords',
+    return _queryAdapter.query(
+        'SELECT COALESCE(SUM(points), 0) FROM dietRecords',
         mapper: (Map<String, Object?> row) => row.values.first as int);
   }
 
@@ -334,7 +336,8 @@ class _$WorkoutRecordDao extends WorkoutRecordDao {
 
   @override
   Future<int?> getSumOfPoints() async {
-    return _queryAdapter.query('SELECT SUM(points) FROM workoutRecords',
+    return _queryAdapter.query(
+        'SELECT COALESCE(SUM(points), 0) FROM workoutRecords',
         mapper: (Map<String, Object?> row) => row.values.first as int);
   }
 

@@ -96,7 +96,7 @@ class _WorkoutRecorderState extends State<WorkoutRecorder> {
   void _deleteWorkoutRecord(WorkoutRecord record) async {
     final database = Provider.of<RecorderDatabase>(context, listen: false);
     await database.workoutRecordDao.deleteWorkoutRecord(record);
-    Provider.of<RecordingState>(context, listen: false).deductPoints();
+    Provider.of<RecordingState>(context, listen: false).deductPoints(record.points);
     _loadWorkoutRecords();
   }
 
