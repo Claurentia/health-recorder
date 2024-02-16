@@ -67,9 +67,7 @@ class _WorkoutRecorderState extends State<WorkoutRecorder> {
   void recordExercise(WorkoutRecord newRecord) async {
     final database = Provider.of<RecorderDatabase>(context, listen: false);
     await database.workoutRecordDao.insertWorkoutRecord(newRecord);
-    setState(() {
-      workoutRecords.insert(0, newRecord);
-    });
+    _loadWorkoutRecords();
     _durationController.clear();
   }
 

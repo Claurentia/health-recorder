@@ -41,7 +41,7 @@ class RecordingState extends ChangeNotifier {
 
     if (activityDatePairs.isNotEmpty) {
       final mostRecentActivity = activityDatePairs.first;
-      lastRecordingTime = mostRecentActivity.value;
+      lastRecordingTime = mostRecentActivity.value.add(Duration(hours: 1));
       lastRecordingActivity = mostRecentActivity.key;
     }
 
@@ -49,8 +49,7 @@ class RecordingState extends ChangeNotifier {
   }
 
   void deductPoints(int points) {
-    recordingPoints -= points;
-    notifyListeners();
+    updatePointsAndLastActivity();
   }
 
   int recordActivity(String activity) {

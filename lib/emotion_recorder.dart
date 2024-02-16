@@ -73,22 +73,13 @@ class _EmotionRecorderState extends State<EmotionRecorder> {
   void _addToDB(EmotionRecord newRecord) async {
     final database = Provider.of<RecorderDatabase>(context, listen: false);
     await database.emotionRecordDao.insertEmotionRecord(newRecord);
-    setState(() {
-      emojiRecords.add(newRecord);
-      selectedEmoji = newRecord.emoji;
-    });
+    _loadEmojiRecords();
   }
 
   void _deleteRecord(EmotionRecord record, int index) async {
     final database = Provider.of<RecorderDatabase>(context, listen: false);
     await database.emotionRecordDao.deleteEmotionRecord(record);
-
-    int selectedIndex = emojiRecords.length - 1 - index;
-
-    setState(() {
-      emojiRecords.removeAt(selectedIndex);
-      _loadSelectedEmoji();
-    });
+    _loadEmojiRecords();
     Provider.of<RecordingState>(context, listen: false).deductPoints(record.points);
   }
 
