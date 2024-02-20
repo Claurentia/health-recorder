@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'dart:math';
+import './appLocalizations.dart';
 import 'floor_model/recorder_database.dart';
 import 'floor_model/recorder_entity.dart';
 
@@ -81,17 +82,19 @@ class RecordingStatusWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final AppLocalizations localizations = AppLocalizations.of(context);
+
     final recordingState = Provider.of<RecordingState>(context);
     String dedicationLevel = '${recordingState.recordingPoints ~/ 100}';
     String lastRecord = recordingState.lastRecordingTime != null
         ? '${recordingState.lastRecordingActivity} at ${DateFormat('MMM dd, yyyy – kk:mm').format(recordingState.lastRecordingTime!)}'
-        : 'No record';
+        : localizations.translate('noRecord');
 
     int nextLevelPoints = ((recordingState.recordingPoints ~/ 100) + 1) * 100;
     int pointsToNextLevel = nextLevelPoints - recordingState.recordingPoints;
 
     return Container(
-        color: Colors.blueGrey, // Background color
+        color: Colors.blueGrey,
         child: Padding(
           padding: EdgeInsets.all(8.0),
           child: Column(
@@ -105,7 +108,7 @@ class RecordingStatusWidget extends StatelessWidget {
                   SizedBox(width: 8),
                   Flexible(
                     child: Text(
-                      'Last Record: $lastRecord',
+                      '${localizations.translate('lastRecord')}: $lastRecord',
                       style: TextStyle(fontSize: 12, color: Colors.white),
                       overflow: TextOverflow.ellipsis,
                     ),
@@ -122,7 +125,7 @@ class RecordingStatusWidget extends StatelessWidget {
                       Icon(Icons.star, size: 18, color: Colors.white),
                       SizedBox(width: 8),
                       Text(
-                        'Dedication Level: $dedicationLevel',
+                        '${localizations.translate('dedicationLevel')}: $dedicationLevel',
                         style: TextStyle(fontSize: 12, color: Colors.white),
                       ),
                     ],
@@ -133,7 +136,7 @@ class RecordingStatusWidget extends StatelessWidget {
                       Icon(Icons.trending_up, size: 18, color: Colors.white),
                       SizedBox(width: 8),
                       Text(
-                        'Next Level: $pointsToNextLevel pts ',
+                        '${localizations.translate('nextLevel')}: $pointsToNextLevel ${localizations.translate('points')} ',
                         style: TextStyle(fontSize: 12, color: Colors.white),
                       ),
                     ],

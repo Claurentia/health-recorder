@@ -50,9 +50,10 @@
   "Swimming": "Swimming",
 
   "noRecord": "No record",
-  "lastRecord": "Last Record: {lastRecord}",
-  "dedicationLevel": "Dedication Level: {level}",
-  "nextLevel": "Next Level: {points} pts",
+  "lastRecord": "Last Record",
+  "dedicationLevel": "Dedication Level",
+  "nextLevel": "Next Level",
+  "points": "pts",
 
   "chooseLanguage": "Choose Language",
   "en": "English",

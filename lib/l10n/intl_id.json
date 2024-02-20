@@ -50,9 +50,10 @@
   "Swimming": "Berenang",
 
   "noRecord": "Tidak ada catatan",
-  "lastRecord": "Catatan Terakhir: {lastRecord}",
-  "dedicationLevel": "Tingkat Dedikasi: {level}",
-  "nextLevel": "Tingkat Berikutnya: {points} poin",
+  "lastRecord": "Catatan Terakhir",
+  "dedicationLevel": "Tingkat Dedikasi",
+  "nextLevel": "Tingkat Berikutnya",
+  "point": "poin",
 
   "chooseLanguage": "Pilih Bahasa",
   "en": "Bahasa Inggris",
