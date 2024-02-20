@@ -17,6 +17,7 @@
 
   "selectedOn": "Selected on: ",
   "recordedAt": "Recorded at",
+  "pleaseFillInAllFields": "Please fill in all fields",
 
   "feelingToday": "How are you feeling today?",
   "selectMood": "Select Mood",
@@ -35,15 +36,18 @@
   "enterNewCalories": "Enter new calories amount",
 
   "recordYourWorkout": "Record Your Workout",
-  "pleaseFillInAllFields": "Please fill in all fields",
   "recordWorkout": "Record Workout",
   "workoutHistory": "Workout History",
   "confirmDeleteWorkoutRecord": "Are you sure you want to delete this workout record?",
   "durationMinutes": "Duration (minutes)",
   "enterDurationOfWorkout": "Enter duration of workout",
   "reps": "Reps",
+  "minutes": "minutes",
   "enterNumberOfReps": "Enter number of reps",
   "caloriesBurned": "Calories burned",
+  "Running": "Running",
+  "Cycling": "Cycling",
+  "Swimming": "Swimming",
 
   "noRecord": "No record",
   "lastRecord": "Last Record: {lastRecord}",

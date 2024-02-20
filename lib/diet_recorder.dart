@@ -37,10 +37,12 @@ class _DietRecorderState extends State<DietRecorder> {
   }
 
   void _onRecordTap(BuildContext context) {
+    final AppLocalizations localizations = AppLocalizations.of(context);
+
     if (_itemController.text.isEmpty || _calController.text.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Please fill in all fields'),
+        SnackBar(
+          content: Text(localizations.translate('pleaseFillInAllFields')),
           backgroundColor: Colors.red,
         ),
       );

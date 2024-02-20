@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import './recording_state_provider.dart';
+import './appLocalizations.dart';
 import 'floor_model/recorder_database.dart';
 import 'floor_model/recorder_entity.dart';
 
@@ -43,10 +44,12 @@ class _WorkoutRecorderState extends State<WorkoutRecorder> {
   }
 
   void _onRecordTap(BuildContext context) {
+    final AppLocalizations localizations = AppLocalizations.of(context);
+
     if (_durationController.text.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Please fill in all fields'),
+        SnackBar(
+          content: Text(localizations.translate('pleaseFillInAllFields')),
           backgroundColor: Colors.red,
         ),
       );
@@ -99,23 +102,25 @@ class _WorkoutRecorderState extends State<WorkoutRecorder> {
   }
 
   void _confirmDeleteWorkoutRecord(WorkoutRecord record) {
+    final AppLocalizations localizations = AppLocalizations.of(context);
+
     showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: const Text("Confirm Record"),
-          content: const Text("Are you sure you want to delete this workout record?"),
+          title: Text(localizations.translate('confirmDeleteTitle')),
+          content: Text(localizations.translate('confirmDeleteWorkoutRecord')),
           actions: [
             TextButton(
               onPressed: () => Navigator.of(context).pop(),
-              child: const Text("Cancel"),
+              child: Text(localizations.translate('cancel')),
             ),
             TextButton(
               onPressed: () {
                 _deleteWorkoutRecord(record);
                 Navigator.of(context).pop();
               },
-              child: const Text("Delete", style: TextStyle(color: Colors.red)),
+              child: Text(localizations.translate('delete'), style: TextStyle(color: Colors.red)),
             ),
           ],
         );
@@ -130,6 +135,8 @@ class _WorkoutRecorderState extends State<WorkoutRecorder> {
 
   @override
   Widget build(BuildContext context) {
+    final AppLocalizations localizations = AppLocalizations.of(context);
+
     return GestureDetector(
         onTap: () {
           FocusScope.of(context).requestFocus(FocusNode());
@@ -144,8 +151,8 @@ class _WorkoutRecorderState extends State<WorkoutRecorder> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
                 const SizedBox(height: 10),
-                const Text('Record Your Workout',
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                Text(localizations.translate('recordYourWorkout'),
+                  style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                 ),
                 const SizedBox(height: 10),
                 DropdownButtonFormField<String>(
@@ -160,7 +167,7 @@ class _WorkoutRecorderState extends State<WorkoutRecorder> {
                   items: exercises.map<DropdownMenuItem<String>>((String value) {
                     return DropdownMenuItem<String>(
                       value: value,
-                      child: Text(value),
+                      child: Text(localizations.translate(value)),
                     );
                   }).toList(),
                 ),
@@ -170,25 +177,25 @@ class _WorkoutRecorderState extends State<WorkoutRecorder> {
                   keyboardType: TextInputType.number,
                   decoration: InputDecoration(
                     border: const OutlineInputBorder(),
-                    labelText: isDurationBasedExercise(selectedExercise) ? 'Duration (minutes)' : 'Reps',
+                    labelText: isDurationBasedExercise(selectedExercise) ? localizations.translate('durationMinutes') : localizations.translate('reps'),
                     hintText: isDurationBasedExercise(selectedExercise)
-                        ? 'Enter duration of workout'
-                        : 'Enter number of reps',
+                        ? localizations.translate('enterDurationOfWorkout')
+                        : localizations.translate('enterNumberOfReps'),
                   ),
                 ),
                 const SizedBox(height: 20),
                 Center(
                   child: ElevatedButton(
                     onPressed: () => _onRecordTap(context),
-                    child: const Text('Record Workout'),
+                    child: Text(localizations.translate('recordWorkout')),
                   ),
                 ),
                 const SizedBox(height: 20),
                 const Divider(),
-                const Padding(
+                Padding(
                   padding: EdgeInsets.all(10.0),
                   child: Text(
-                    'Workout History',
+                    localizations.translate('workoutHistory'),
                     style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                   ),
                 ),
@@ -198,8 +205,8 @@ class _WorkoutRecorderState extends State<WorkoutRecorder> {
             for (var record in workoutRecords)
               ListTile(
                 leading: const Icon(Icons.fitness_center),
-                title: Text(" ${record.workout} - ${record.durationOrReps} ${isDurationBasedExercise(record.workout) ? 'minutes' : 'reps'}", style: TextStyle(fontSize: 16),),
-                subtitle: Text(" Calories burned: ${record.caloriesBurned} cal \n Recorded at ${record.dateTime}", style: TextStyle(fontSize: 12),),
+                title: Text(" ${localizations.translate(record.workout)} - ${record.durationOrReps} ${isDurationBasedExercise(record.workout) ? localizations.translate('minutes') : 'reps'}", style: TextStyle(fontSize: 16),),
+                subtitle: Text(" ${localizations.translate('caloriesBurned')}: ${record.caloriesBurned} cal \n ${localizations.translate('recordedAt')} ${record.dateTime}", style: TextStyle(fontSize: 12),),
                 trailing: IconButton(
                   icon: const Icon(Icons.delete, color: Colors.red),
                   onPressed: () => _confirmDeleteWorkoutRecord(record),

@@ -17,6 +17,7 @@
 
   "selectedOn": "Dipilih pada: ",
   "recordedAt": "Dicatat pada",
+  "pleaseFillInAllFields": "Mohon isi semua kolom",
 
   "feelingToday": "Bagaimana perasaan Anda hari ini?",
   "selectMood": "Pilih Mood",
@@ -35,15 +36,18 @@
   "enterNewCalories": "Masukkan jumlah kalori baru",
 
   "recordYourWorkout": "Catat Latihan Anda",
-  "pleaseFillInAllFields": "Mohon isi semua kolom",
   "recordWorkout": "Catat Latihan",
   "workoutHistory": "Riwayat Latihan",
   "confirmDeleteWorkoutRecord": "Apakah Anda yakin ingin menghapus catatan latihan ini?",
   "durationMinutes": "Durasi (menit)",
   "enterDurationOfWorkout": "Masukkan durasi latihan",
   "reps": "Repetisi",
+  "minutes": "menit",
   "enterNumberOfReps": "Masukkan jumlah repetisi",
   "caloriesBurned": "Kalori terbakar",
+  "Running": "Lari",
+  "Cycling": "Bersepeda",
+  "Swimming": "Berenang",
 
   "noRecord": "Tidak ada catatan",
   "lastRecord": "Catatan Terakhir: {lastRecord}",
