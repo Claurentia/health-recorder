@@ -1,0 +1,53 @@
+{
+  "appTitle": "Perekam Kesehatan",
+  "emotionRecorderTitle": "Perekam Emosi",
+  "dietRecorderTitle": "Perekam Diet",
+  "workoutRecorderTitle": "Perekam Olahraga",
+
+  "emotionTab": "Emosi",
+  "dietTab": "Diet",
+  "workoutTab": "Olahraga",
+
+  "cancel": "Batal",
+  "delete": "Hapus",
+  "edit": "Edit",
+  "update": "Perbarui",
+  "confirmDeleteTitle": "Konfirmasi Hapus",
+  "confirmDeleteContent": "Apakah Anda yakin ingin menghapus catatan ini?",
+
+  "feelingToday": "Bagaimana perasaan Anda hari ini?",
+  "selectMood": "Pilih Mood",
+  "yourMoodToday": "Mood Anda hari ini",
+  "moodHistory": "Riwayat Mood",
+  "selectedOn": "Dipilih pada: ",
+
+  "whatDidYouEatToday": "Apa yang Anda makan hari ini?",
+  "recordDiet": "Catat Diet",
+  "foodItemLabel": "Item Makanan",
+  "enterFoodItem": "Masukkan item makanan",
+  "caloriesLabel": "Kalori",
+  "enterCalories": "Masukkan jumlah kalori",
+  "dietHistory": "Riwayat Diet",
+  "confirmDeleteDietRecord": "Apakah Anda yakin ingin menghapus catatan diet ini?",
+
+  "recordYourWorkout": "Catat Latihan Anda",
+  "pleaseFillInAllFields": "Mohon isi semua kolom",
+  "recordWorkout": "Catat Latihan",
+  "workoutHistory": "Riwayat Latihan",
+  "confirmDeleteWorkoutRecord": "Apakah Anda yakin ingin menghapus catatan latihan ini?",
+  "durationMinutes": "Durasi (menit)",
+  "enterDurationOfWorkout": "Masukkan durasi latihan",
+  "reps": "Repetisi",
+  "enterNumberOfReps": "Masukkan jumlah repetisi",
+  "caloriesBurned": "Kalori terbakar",
+  "recordedAt": "Dicatat pada",
+
+  "noRecord": "Tidak ada catatan",
+  "lastRecord": "Catatan Terakhir: {lastRecord}",
+  "dedicationLevel": "Tingkat Dedikasi: {level}",
+  "nextLevel": "Tingkat Berikutnya: {points} poin",
+
+  "chooseLanguage": "Pilih Bahasa",
+  "en": "Bahasa Inggris",
+  "id": "Bahasa Indonesia"
+}

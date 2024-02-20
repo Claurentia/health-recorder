@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import './recording_state_provider.dart';
+import './appLocalizations.dart';
 import 'floor_model/recorder_database.dart';
 import 'floor_model/recorder_entity.dart';
 
@@ -44,18 +45,13 @@ class _EmotionRecorderState extends State<EmotionRecorder> {
     final database = Provider.of<RecorderDatabase>(context, listen: false);
     final lastRecord = await database.emotionRecordDao.getLastInsertedRecord();
 
-    String newSelectedEmoji;
+    String? newSelectedEmoji;
     if (lastRecord != null) {
       final recordDateStr = lastRecord.dateTime.split(' – ')[0];
       if (recordDateStr == todayStr) {
         newSelectedEmoji = lastRecord.emoji;
-      } else {
-        newSelectedEmoji = "Today's Mood";
       }
-    } else {
-      newSelectedEmoji = "Today's Mood";
     }
-
     setState(() {
       selectedEmoji = newSelectedEmoji;
     });
@@ -84,25 +80,27 @@ class _EmotionRecorderState extends State<EmotionRecorder> {
   }
 
   void _deleteRecordConfirmation(EmotionRecord record, int index) {
+    final AppLocalizations localizations = AppLocalizations.of(context);
+
     showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: const Text("Confirm Delete"),
-          content: const Text("Are you sure you want to delete this record?"),
+          title: Text(localizations.translate('confirmDeleteTitle')),
+          content: Text(localizations.translate('confirmDeleteContent')),
           actions: <Widget>[
             TextButton(
               onPressed: () {
                 Navigator.of(context).pop();
               },
-              child: const Text("Cancel"),
+              child: Text(localizations.translate('cancel')),
             ),
             TextButton(
               onPressed: () {
                 Navigator.of(context).pop();
                 _deleteRecord(record, index);
               },
-              child: const Text("Delete", style: TextStyle(color: Colors.red)),
+              child: Text(localizations.translate('delete'), style: const TextStyle(color: Colors.red)),
             ),
           ],
         );
@@ -143,21 +141,23 @@ class _EmotionRecorderState extends State<EmotionRecorder> {
 
   @override
   Widget build(BuildContext context) {
+    final AppLocalizations localizations = AppLocalizations.of(context);
+
     return Scaffold(
       backgroundColor: const Color(0xFFF5F5F5),
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const SizedBox(height: 10),
-          const Padding(
+          Padding(
             padding: EdgeInsets.all(10.0),
-            child: Text('How are you feeling today?',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            child: Text(localizations.translate('feelingToday'),
+              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
           ),
           const SizedBox(height: 10,),
           Center(
-            child: Text(selectedEmoji ?? 'Your mood today',
+            child: Text(selectedEmoji ?? localizations.translate('yourMoodToday'),
               key: const Key('yourMoodTodayKey'),
               style: const TextStyle(fontSize: 24),
             ),
@@ -166,15 +166,15 @@ class _EmotionRecorderState extends State<EmotionRecorder> {
           Center(
             child: ElevatedButton(
               onPressed: _showEmojiPicker,
-              child: const Text('Select Mood'),
+              child: Text(localizations.translate('selectMood')),
             ),
           ),
           const SizedBox(height: 30),
           const Divider(),
           const SizedBox(height: 10),
-          const Padding(
+          Padding(
             padding: EdgeInsets.all(10.0),
-            child: Text('Mood History',
+            child: Text(localizations.translate('moodHistory'),
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
           ),
@@ -187,7 +187,7 @@ class _EmotionRecorderState extends State<EmotionRecorder> {
                 EmotionRecord record = emojiRecords[reversedIndex];
                 return ListTile(
                   leading: Text(record.emoji, style: TextStyle(fontSize: 24)),
-                  title: Text('Selected on: ${record.dateTime}', style: TextStyle(fontSize: 15)),
+                  title: Text('${localizations.translate('selectedOn')} ${record.dateTime}', style: TextStyle(fontSize: 15)),
                   trailing: IconButton(
                     icon: Icon(Icons.delete, color: Colors.red),
                     onPressed: () => _deleteRecordConfirmation(record, index),

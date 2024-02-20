@@ -1,0 +1,53 @@
+{
+  "appTitle": "Health Recorder",
+  "emotionRecorderTitle": "Emotion Recorder",
+  "dietRecorderTitle": "Diet Recorder",
+  "workoutRecorderTitle": "Workout Recorder",
+
+  "emotionTab": "Emotion",
+  "dietTab": "Diet",
+  "workoutTab": "Workout",
+
+  "cancel": "Cancel",
+  "delete": "Delete",
+  "edit": "Edit",
+  "update": "Update",
+  "confirmDeleteTitle": "Confirm Delete",
+  "confirmDeleteContent": "Are you sure you want to delete this record?",
+
+  "feelingToday": "How are you feeling today?",
+  "selectMood": "Select Mood",
+  "yourMoodToday": "Your mood today",
+  "moodHistory": "Mood History",
+  "selectedOn": "Selected on: ",
+
+  "whatDidYouEatToday": "What did you eat today?",
+  "recordDiet": "Record Diet",
+  "foodItemLabel": "Food Item",
+  "enterFoodItem": "Enter food item",
+  "caloriesLabel": "Calories",
+  "enterCalories": "Enter the amount of calories",
+  "dietHistory": "Diet History",
+  "confirmDeleteDietRecord": "Are you sure you want to delete this diet record?",
+
+  "recordYourWorkout": "Record Your Workout",
+  "pleaseFillInAllFields": "Please fill in all fields",
+  "recordWorkout": "Record Workout",
+  "workoutHistory": "Workout History",
+  "confirmDeleteWorkoutRecord": "Are you sure you want to delete this workout record?",
+  "durationMinutes": "Duration (minutes)",
+  "enterDurationOfWorkout": "Enter duration of workout",
+  "reps": "Reps",
+  "enterNumberOfReps": "Enter number of reps",
+  "caloriesBurned": "Calories burned",
+  "recordedAt": "Recorded at",
+
+  "noRecord": "No record",
+  "lastRecord": "Last Record: {lastRecord}",
+  "dedicationLevel": "Dedication Level: {level}",
+  "nextLevel": "Next Level: {points} pts",
+
+  "chooseLanguage": "Choose Language",
+  "en": "English",
+  "id": "Indonesian"
+}
