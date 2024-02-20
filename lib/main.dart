@@ -33,10 +33,19 @@ class MyApp extends StatefulWidget {
 
 class _MyAppState extends State<MyApp> {
   Locale _locale = const Locale('en');
+  bool _useMaterialDesign = true;
+
+  bool get useMaterialDesign => _useMaterialDesign;
 
   void setLocale(Locale locale) {
     setState(() {
       _locale = locale;
+    });
+  }
+
+  void setStyle(bool useMaterialDesign) {
+    setState(() {
+      _useMaterialDesign = useMaterialDesign;
     });
   }
 
@@ -100,26 +109,51 @@ class HealthRecorder extends StatefulWidget {
 class _HealthRecorderState extends State<HealthRecorder> {
   int _selectedIndex = 0;
 
-  void _showLanguageChangeDialog(BuildContext context) {
+  void _showSettingDialog(BuildContext context) {
+    final appState = MyApp.of(context);
     showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text(AppLocalizations.of(context).translate('chooseLanguage')),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: const <Locale>[Locale('en', ''), Locale('id', '')].map((Locale locale) {
-              return RadioListTile<Locale>(
-                title: Text(AppLocalizations.of(context).translate(locale.languageCode)),
-                value: locale,
-                groupValue: MyApp.of(context)!._locale,
-                onChanged: (Locale? value) {
-                  MyApp.of(context)?.setLocale(value!);
-                  Navigator.of(context).pop();
-                },
-              );
-            }).toList(),
+          title: Text(AppLocalizations.of(context).translate('Settings')),
+          content: SingleChildScrollView(
+            child: ListBody(
+              children: <Widget>[
+                Text(AppLocalizations.of(context).translate('chooseLanguage')),
+                Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: const <Locale>[Locale('en', ''), Locale('id', '')].map((Locale locale) {
+                    return RadioListTile<Locale>(
+                      title: Text(AppLocalizations.of(context).translate(locale.languageCode)),
+                      value: locale,
+                      groupValue: MyApp.of(context)!._locale,
+                      onChanged: (Locale? value) {
+                        MyApp.of(context)?.setLocale(value!);
+                      },
+                    );
+                  }).toList(),
+                ),
+                const Divider(),
+                Text(AppLocalizations.of(context).translate('chooseTheme')),
+                SwitchListTile(
+                  title: Text(appState!.useMaterialDesign ? 'Material' : 'Cupertino'),
+                  value: appState.useMaterialDesign,
+                  onChanged: (bool value) {
+                    appState.setStyle(value);
+                    setState(() {});
+                  },
+                ),
+              ],
+            ),
           ),
+          actions: <Widget>[
+            TextButton(
+              child: Text(AppLocalizations.of(context).translate('close')),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
         );
       },
     );
@@ -150,7 +184,7 @@ class _HealthRecorderState extends State<HealthRecorder> {
             icon: const Icon(Icons.settings),
             color: Colors.white,
             onPressed: () {
-              _showLanguageChangeDialog(context);
+              _showSettingDialog(context);
             },
           ),
         ],

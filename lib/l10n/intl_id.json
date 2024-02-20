@@ -37,15 +37,15 @@
 
   "recordYourWorkout": "Catat Latihan Anda",
   "recordWorkout": "Catat Latihan",
-  "workoutHistory": "Riwayat Latihan",
-  "confirmDeleteWorkoutRecord": "Apakah Anda yakin ingin menghapus catatan latihan ini?",
+  "workoutHistory": "Riwayat Olahraga",
+  "confirmDeleteWorkoutRecord": "Apakah Anda yakin ingin menghapus catatan olahraga ini?",
   "durationMinutes": "Durasi (menit)",
   "enterDurationOfWorkout": "Masukkan durasi latihan",
   "reps": "Repetisi",
   "minutes": "menit",
   "enterNumberOfReps": "Masukkan jumlah repetisi",
   "caloriesBurned": "Kalori terbakar",
-  "Running": "Lari",
+  "Running": "Berlari",
   "Cycling": "Bersepeda",
   "Swimming": "Berenang",
 
@@ -57,5 +57,7 @@
 
   "chooseLanguage": "Pilih Bahasa",
   "en": "Bahasa Inggris",
-  "id": "Bahasa Indonesia"
+  "id": "Bahasa Indonesia",
+
+  "chooseStyle": "Pilih Tema"
 }
