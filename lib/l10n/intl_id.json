@@ -11,15 +11,17 @@
   "cancel": "Batal",
   "delete": "Hapus",
   "edit": "Edit",
-  "update": "Perbarui",
+  "update": "Catat",
   "confirmDeleteTitle": "Konfirmasi Hapus",
   "confirmDeleteContent": "Apakah Anda yakin ingin menghapus catatan ini?",
+
+  "selectedOn": "Dipilih pada: ",
+  "recordedAt": "Dicatat pada",
 
   "feelingToday": "Bagaimana perasaan Anda hari ini?",
   "selectMood": "Pilih Mood",
   "yourMoodToday": "Mood Anda hari ini",
   "moodHistory": "Riwayat Mood",
-  "selectedOn": "Dipilih pada: ",
 
   "whatDidYouEatToday": "Apa yang Anda makan hari ini?",
   "recordDiet": "Catat Diet",
@@ -29,6 +31,8 @@
   "enterCalories": "Masukkan jumlah kalori",
   "dietHistory": "Riwayat Diet",
   "confirmDeleteDietRecord": "Apakah Anda yakin ingin menghapus catatan diet ini?",
+  "editCalories": "Edit Kalori Tercatat",
+  "enterNewCalories": "Masukkan jumlah kalori baru",
 
   "recordYourWorkout": "Catat Latihan Anda",
   "pleaseFillInAllFields": "Mohon isi semua kolom",
@@ -40,7 +44,6 @@
   "reps": "Repetisi",
   "enterNumberOfReps": "Masukkan jumlah repetisi",
   "caloriesBurned": "Kalori terbakar",
-  "recordedAt": "Dicatat pada",
 
   "noRecord": "Tidak ada catatan",
   "lastRecord": "Catatan Terakhir: {lastRecord}",

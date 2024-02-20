@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import './recording_state_provider.dart';
+import './appLocalizations.dart';
 import 'floor_model/recorder_database.dart';
 import 'floor_model/recorder_entity.dart';
 
@@ -73,23 +74,25 @@ class _DietRecorderState extends State<DietRecorder> {
   }
 
   void _confirmDeleteDietRecord(DietRecord record) {
+    final AppLocalizations localizations = AppLocalizations.of(context);
+
     showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: const Text("Confirm Record"),
-          content: const Text("Are you sure you want to delete this diet record?"),
+          title: Text(localizations.translate('confirmDeleteTitle')),
+          content: Text(localizations.translate('confirmDeleteDietRecord')),
           actions: [
             TextButton(
               onPressed: () => Navigator.of(context).pop(),
-              child: const Text("Cancel"),
+              child: Text(localizations.translate('cancel')),
             ),
             TextButton(
               onPressed: () {
                 _deleteDietRecord(record);
                 Navigator.of(context).pop();
               },
-              child: const Text("Delete", style: TextStyle(color: Colors.red)),
+              child: Text(localizations.translate('delete'), style: TextStyle(color: Colors.red)),
             ),
           ],
         );
@@ -99,28 +102,29 @@ class _DietRecorderState extends State<DietRecorder> {
 
   void _showEditCaloriesDialog(DietRecord record) {
     final TextEditingController editCalController = TextEditingController(text: record.calories.toString());
+    final AppLocalizations localizations = AppLocalizations.of(context);
 
     showDialog(
       context: context,
       builder: (context) {
         return AlertDialog(
-          title: const Text('Edit Calories Entry'),
+          title: Text(localizations.translate('editCalories')),
           content: TextField(
             controller: editCalController,
             keyboardType: TextInputType.number,
-            decoration: const InputDecoration(
-              hintText: 'Enter new calorie amount',
+            decoration: InputDecoration(
+              hintText: localizations.translate('enterNewCalories'),
             ),
           ),
           actions: <Widget>[
             TextButton(
-              child: const Text('Cancel'),
+              child: Text(localizations.translate('cancel')),
               onPressed: () {
                 Navigator.of(context).pop();
               },
             ),
             TextButton(
-              child: const Text('Update'),
+              child: Text(localizations.translate('update')),
               onPressed: () {
                 _updateDietRecordCalories(record, int.tryParse(editCalController.text) ?? record.calories);
                 Navigator.of(context).pop();
@@ -139,14 +143,16 @@ class _DietRecorderState extends State<DietRecorder> {
   }
 
   Widget foodItemInput() {
+    final AppLocalizations localizations = AppLocalizations.of(context);
+
     return Row(
       children: <Widget>[
         Expanded(
           child: TextField(
             controller: _itemController,
-            decoration: const InputDecoration(
-              labelText: 'Food Item',
-              hintText: 'Enter food item',
+            decoration: InputDecoration(
+              labelText: localizations.translate('foodItemLabel'),
+              hintText: localizations.translate('enterFoodItem'),
             ),
           ),
         ),
@@ -177,6 +183,8 @@ class _DietRecorderState extends State<DietRecorder> {
 
   @override
   Widget build(BuildContext context) {
+    final AppLocalizations localizations = AppLocalizations.of(context);
+
     return GestureDetector(
         onTap: () {
           FocusScope.of(context).requestFocus(FocusNode());
@@ -191,7 +199,7 @@ class _DietRecorderState extends State<DietRecorder> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: <Widget>[
                       const SizedBox(height: 10),
-                      const Text('What did you eat today?',
+                      Text(localizations.translate('whatDidYouEatToday'),
                         style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                       ),
                       const SizedBox(height: 10),
@@ -200,17 +208,17 @@ class _DietRecorderState extends State<DietRecorder> {
                       TextField(
                         controller: _calController,
                         keyboardType: TextInputType.number,
-                        decoration: const InputDecoration(
+                        decoration: InputDecoration(
                           border: OutlineInputBorder(),
-                          labelText: 'Calories',
-                          hintText: 'Enter the amount of calories',
+                          labelText: localizations.translate('caloriesLabel'),
+                          hintText: localizations.translate('enterCalories'),
                         ),
                       ),
                       const SizedBox(height: 20),
                       Center(
                         child: ElevatedButton(
                           onPressed: () => _onRecordTap(context),
-                          child: const Text('Record Diet'),
+                          child: Text(localizations.translate('recordDiet')),
                         ),
                       ),
                       const SizedBox(height: 10,),
@@ -218,16 +226,16 @@ class _DietRecorderState extends State<DietRecorder> {
                 ),
               ),
               const Divider(),
-              const Padding(
+              Padding(
                 padding: EdgeInsets.all(10.0),
-                child: Text('Diet History',
+                child: Text(localizations.translate('dietHistory'),
                   style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),),
               ),
               for (var record in dietRecords)
                 ListTile(
                   leading: const Icon(Icons.fastfood),
                   title: Text(record.foodItem, style: TextStyle(fontSize: 16),),
-                  subtitle: Text(" Calories: ${record.calories} cal \n Recorded at ${record.dateTime}", style: TextStyle(fontSize: 12),),
+                  subtitle: Text(" ${localizations.translate('caloriesLabel')}: ${record.calories} cal \n ${localizations.translate('recordedAt')} ${record.dateTime}", style: TextStyle(fontSize: 12),),
                   trailing: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [

@@ -15,11 +15,13 @@
   "confirmDeleteTitle": "Confirm Delete",
   "confirmDeleteContent": "Are you sure you want to delete this record?",
 
+  "selectedOn": "Selected on: ",
+  "recordedAt": "Recorded at",
+
   "feelingToday": "How are you feeling today?",
   "selectMood": "Select Mood",
   "yourMoodToday": "Your mood today",
   "moodHistory": "Mood History",
-  "selectedOn": "Selected on: ",
 
   "whatDidYouEatToday": "What did you eat today?",
   "recordDiet": "Record Diet",
@@ -29,6 +31,8 @@
   "enterCalories": "Enter the amount of calories",
   "dietHistory": "Diet History",
   "confirmDeleteDietRecord": "Are you sure you want to delete this diet record?",
+  "editCalories": "Edit Calories Entry",
+  "enterNewCalories": "Enter new calories amount",
 
   "recordYourWorkout": "Record Your Workout",
   "pleaseFillInAllFields": "Please fill in all fields",
@@ -40,7 +44,6 @@
   "reps": "Reps",
   "enterNumberOfReps": "Enter number of reps",
   "caloriesBurned": "Calories burned",
-  "recordedAt": "Recorded at",
 
   "noRecord": "No record",
   "lastRecord": "Last Record: {lastRecord}",
