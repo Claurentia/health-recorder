@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
@@ -5,6 +6,7 @@ import './recording_state_provider.dart';
 import './appLocalizations.dart';
 import 'floor_model/recorder_database.dart';
 import 'floor_model/recorder_entity.dart';
+import './main.dart';
 
 class DietRecorder extends StatefulWidget {
   const DietRecorder({super.key});
@@ -40,12 +42,29 @@ class _DietRecorderState extends State<DietRecorder> {
     final AppLocalizations localizations = AppLocalizations.of(context);
 
     if (_itemController.text.isEmpty || _calController.text.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(localizations.translate('pleaseFillInAllFields')),
-          backgroundColor: Colors.red,
-        ),
-      );
+      if (MyApp.of(context)!.useMaterialDesign) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(localizations.translate('pleaseFillInAllFields')),
+            backgroundColor: Colors.red,
+          ),
+        );
+      } else {
+        showCupertinoDialog(
+          context: context,
+          builder: (BuildContext context) => CupertinoAlertDialog(
+            title: Text(localizations.translate('Alert')),
+            content: Text(localizations.translate('pleaseFillInAllFields')),
+            actions: <CupertinoDialogAction>[
+              CupertinoDialogAction(
+                isDefaultAction: true,
+                onPressed: () => Navigator.of(context).pop(),
+                child: Text(localizations.translate('Ok')),
+              ),
+            ],
+          ),
+        );
+      }
       return;
     }
 
@@ -81,23 +100,42 @@ class _DietRecorderState extends State<DietRecorder> {
     showDialog(
       context: context,
       builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text(localizations.translate('confirmDeleteTitle')),
-          content: Text(localizations.translate('confirmDeleteDietRecord')),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(),
-              child: Text(localizations.translate('cancel')),
-            ),
-            TextButton(
-              onPressed: () {
-                _deleteDietRecord(record);
-                Navigator.of(context).pop();
-              },
-              child: Text(localizations.translate('delete'), style: TextStyle(color: Colors.red)),
-            ),
-          ],
-        );
+        return MyApp.of(context)!.useMaterialDesign
+          ? AlertDialog(
+            title: Text(localizations.translate('confirmDeleteTitle')),
+            content: Text(localizations.translate('confirmDeleteDietRecord')),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(),
+                child: Text(localizations.translate('cancel')),
+              ),
+              TextButton(
+                onPressed: () {
+                  _deleteDietRecord(record);
+                  Navigator.of(context).pop();
+                },
+                child: Text(localizations.translate('delete'), style: TextStyle(color: Colors.red)),
+              ),
+            ],
+          )
+          : CupertinoAlertDialog(
+            title: Text(localizations.translate('confirmDeleteTitle')),
+            content: Text(localizations.translate('confirmDeleteDietRecord')),
+            actions: [
+              CupertinoDialogAction(
+                onPressed: () => Navigator.of(context).pop(),
+                child: Text(localizations.translate('cancel')),
+              ),
+              CupertinoDialogAction(
+                isDestructiveAction: true,
+                onPressed: () {
+                  _deleteDietRecord(record);
+                  Navigator.of(context).pop();
+                },
+                child: Text(localizations.translate('delete')),
+              ),
+            ],
+          );
       },
     );
   }
@@ -109,31 +147,55 @@ class _DietRecorderState extends State<DietRecorder> {
     showDialog(
       context: context,
       builder: (context) {
-        return AlertDialog(
-          title: Text(localizations.translate('editCalories')),
-          content: TextField(
-            controller: editCalController,
-            keyboardType: TextInputType.number,
-            decoration: InputDecoration(
-              hintText: localizations.translate('enterNewCalories'),
-            ),
-          ),
-          actions: <Widget>[
-            TextButton(
-              child: Text(localizations.translate('cancel')),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-            ),
-            TextButton(
-              child: Text(localizations.translate('update')),
-              onPressed: () {
-                _updateDietRecordCalories(record, int.tryParse(editCalController.text) ?? record.calories);
-                Navigator.of(context).pop();
-              },
-            ),
-          ],
-        );
+        return MyApp.of(context)!.useMaterialDesign
+            ? AlertDialog(
+              title: Text(localizations.translate('editCalories')),
+              content: TextField(
+                controller: editCalController,
+                keyboardType: TextInputType.number,
+                decoration: InputDecoration(
+                  hintText: localizations.translate('enterNewCalories'),
+                ),
+              ),
+              actions: <Widget>[
+                TextButton(
+                  child: Text(localizations.translate('cancel')),
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                ),
+                TextButton(
+                  child: Text(localizations.translate('update')),
+                  onPressed: () {
+                    _updateDietRecordCalories(record, int.tryParse(editCalController.text) ?? record.calories);
+                    Navigator.of(context).pop();
+                  },
+                ),
+              ],
+            )
+            : CupertinoAlertDialog(
+              title: Text(localizations.translate('editCalories')),
+              content: CupertinoTextField(
+                controller: editCalController,
+                keyboardType: TextInputType.number,
+                placeholder: localizations.translate('enterNewCalories'),
+              ),
+              actions: <Widget>[
+                CupertinoDialogAction(
+                  child: Text(localizations.translate('cancel')),
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                ),
+                CupertinoDialogAction(
+                  child: Text(localizations.translate('update')),
+                  onPressed: () {
+                    _updateDietRecordCalories(record, int.tryParse(editCalController.text) ?? record.calories);
+                    Navigator.of(context).pop();
+                  },
+                ),
+              ],
+            );
       },
     );
   }
@@ -146,19 +208,25 @@ class _DietRecorderState extends State<DietRecorder> {
 
   Widget foodItemInput() {
     final AppLocalizations localizations = AppLocalizations.of(context);
+    final isMaterial = MyApp.of(context)!.useMaterialDesign;
 
     return Row(
       children: <Widget>[
         Expanded(
-          child: TextField(
-            controller: _itemController,
-            decoration: InputDecoration(
-              labelText: localizations.translate('foodItemLabel'),
-              hintText: localizations.translate('enterFoodItem'),
-            ),
+          child: isMaterial
+            ? TextField(
+              controller: _itemController,
+              decoration: InputDecoration(
+                labelText: localizations.translate('foodItemLabel'),
+                hintText: localizations.translate('enterFoodItem'),
+              ),
+            )
+            : CupertinoTextField(
+              controller: _itemController,
+              placeholder: localizations.translate('enterFoodItem'),
           ),
         ),
-        if (previousFoodItems.isNotEmpty)
+        if (previousFoodItems.isNotEmpty && isMaterial)
           DropdownButtonHideUnderline(
             child: DropdownButton<String>(
               key: const Key('dropdown'),
@@ -179,13 +247,90 @@ class _DietRecorderState extends State<DietRecorder> {
               }).toList(),
             ),
           ),
+        if (!isMaterial && previousFoodItems.isNotEmpty)
+          CupertinoButton(
+            child: Icon(CupertinoIcons.arrowtriangle_down, size: 24),
+            onPressed: () {
+              showModalBottomSheet(
+                  context: context,
+                  builder: (BuildContext builder) {
+                    final foodItems = ['']..addAll(previousFoodItems);
+                    return Container(
+                      height: 200,
+                      child: CupertinoPicker(
+                        itemExtent: 32,
+                        onSelectedItemChanged: (int value) {
+                          setState(() {
+                            _itemController.text = foodItems.elementAt(value);
+                          });
+                        },
+                        children: foodItems.map((String value) => Text(value)).toList(),
+                      ),
+                    );
+                  }
+              );
+            },
+          ),
       ],
     );
+  }
+
+  Widget _buildDietRecordsList(DietRecord record) {
+    final AppLocalizations localizations = AppLocalizations.of(context);
+
+    return MyApp.of(context)!.useMaterialDesign
+    ? ListTile(
+        leading: const Icon(Icons.fastfood),
+        title: Text(record.foodItem, style: TextStyle(fontSize: 16),),
+        subtitle: Text(" ${localizations.translate('caloriesLabel')}: ${record.calories} cal \n ${localizations.translate('recordedAt')} ${record.dateTime}", style: TextStyle(fontSize: 12),),
+        trailing: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            IconButton(
+              icon: const Icon(Icons.edit, color: Colors.blue),
+              onPressed: () => _showEditCaloriesDialog(record),
+            ),
+            IconButton(
+              icon: const Icon(Icons.delete, color: Colors.red),
+              onPressed: () => _confirmDeleteDietRecord(record),
+            ),
+          ],
+        ),
+      )
+    : Container(
+        margin: EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+        child: Row(
+          children: [
+            Icon(Icons.fastfood, color: CupertinoColors.systemGrey),
+            SizedBox(width: 10),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(record.foodItem, style: TextStyle(fontSize: 16)),
+                  Text(" ${localizations.translate('caloriesLabel')}: ${record.calories} cal \n ${localizations.translate('recordedAt')} ${record.dateTime}", style: TextStyle(fontSize: 12)),
+                ],
+              ),
+            ),
+            CupertinoButton(
+              padding: EdgeInsets.zero,
+              onPressed: () => _showEditCaloriesDialog(record),
+              child: Icon(CupertinoIcons.pencil, color: CupertinoColors.activeBlue),
+            ),
+            CupertinoButton(
+              padding: EdgeInsets.zero,
+              onPressed: () => _confirmDeleteDietRecord(record),
+              child: Icon(CupertinoIcons.delete, color: CupertinoColors.destructiveRed),
+            ),
+          ],
+        ),
+      );
   }
 
   @override
   Widget build(BuildContext context) {
     final AppLocalizations localizations = AppLocalizations.of(context);
+    final bool useMaterialDesign = MyApp.of(context)!.useMaterialDesign;
 
     return GestureDetector(
         onTap: () {
@@ -207,21 +352,33 @@ class _DietRecorderState extends State<DietRecorder> {
                       const SizedBox(height: 10),
                       foodItemInput(),
                       const SizedBox(height: 10),
-                      TextField(
-                        controller: _calController,
-                        keyboardType: TextInputType.number,
-                        decoration: InputDecoration(
-                          border: OutlineInputBorder(),
-                          labelText: localizations.translate('caloriesLabel'),
-                          hintText: localizations.translate('enterCalories'),
+                      useMaterialDesign
+                      ? TextField(
+                          controller: _calController,
+                          keyboardType: TextInputType.number,
+                          decoration: InputDecoration(
+                            border: OutlineInputBorder(),
+                            labelText: localizations.translate('caloriesLabel'),
+                            hintText: localizations.translate('enterCalories'),
+                          ),
+                        )
+                      : CupertinoTextField(
+                          controller: _calController,
+                          keyboardType: TextInputType.number,
+                          placeholder: localizations.translate('enterCalories'),
                         ),
-                      ),
                       const SizedBox(height: 20),
                       Center(
-                        child: ElevatedButton(
-                          onPressed: () => _onRecordTap(context),
-                          child: Text(localizations.translate('recordDiet')),
-                        ),
+                        child: useMaterialDesign
+                          ? ElevatedButton(
+                            onPressed: () => _onRecordTap(context),
+                            child: Text(localizations.translate('recordDiet')),
+                          )
+                          : CupertinoButton(
+                            onPressed: () => _onRecordTap(context),
+                            color: CupertinoColors.systemTeal,
+                            child: Text(localizations.translate('recordDiet')),
+                          ),
                       ),
                       const SizedBox(height: 10,),
                   ],
@@ -234,24 +391,7 @@ class _DietRecorderState extends State<DietRecorder> {
                   style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),),
               ),
               for (var record in dietRecords)
-                ListTile(
-                  leading: const Icon(Icons.fastfood),
-                  title: Text(record.foodItem, style: TextStyle(fontSize: 16),),
-                  subtitle: Text(" ${localizations.translate('caloriesLabel')}: ${record.calories} cal \n ${localizations.translate('recordedAt')} ${record.dateTime}", style: TextStyle(fontSize: 12),),
-                  trailing: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      IconButton(
-                        icon: const Icon(Icons.edit, color: Colors.blue),
-                        onPressed: () => _showEditCaloriesDialog(record),
-                      ),
-                      IconButton(
-                        icon: const Icon(Icons.delete, color: Colors.red),
-                        onPressed: () => _confirmDeleteDietRecord(record),
-                      ),
-                    ],
-                  ),
-                ),
+                _buildDietRecordsList(record),
             ],
           ),
         ),

@@ -256,8 +256,8 @@ class _EmotionRecorderState extends State<EmotionRecorder> {
             )
             : CupertinoButton(
               onPressed: _showEmojiPicker,
+              color: CupertinoColors.systemTeal,
               child: Text(localizations.translate('selectMood')),
-              color: CupertinoColors.activeBlue,
             ),
           ),
           const SizedBox(height: 30),
