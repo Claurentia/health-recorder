@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "182154926841",
+    "project_id": "health-recorder-93d20",
+    "storage_bucket": "health-recorder-93d20.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:182154926841:android:cf51af6067a58094c52028",
+        "android_client_info": {
+          "package_name": "com.example.hw1"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB6Ryh6-OYygWZUqcZc8CGtf-hjJVe5OWI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -1,3 +1,5 @@
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:go_router/go_router.dart';
@@ -7,10 +9,15 @@ import './diet_recorder.dart';
 import './workout_recorder.dart';
 import './recording_state_provider.dart';
 import './appLocalizations.dart';
+import 'firebase_options.dart';
 import 'floor_model/recorder_database.dart';
+import 'leaderboard_page.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
   final RecorderDatabase database = await $FloorRecorderDatabase.databaseBuilder('app_database.db').build();
 
   runApp(MultiProvider(
@@ -70,6 +77,10 @@ class _MyAppState extends State<MyApp> {
               path: '/workout',
               builder: (BuildContext context, GoRouterState state) => const WorkoutRecorder(),
             ),
+            GoRoute(
+              path: '/leaderboard',
+              builder: (BuildContext context, GoRouterState state) => LeaderboardPage(),
+            ),
           ],
         ),
       ],
@@ -111,6 +122,9 @@ class _HealthRecorderState extends State<HealthRecorder> {
 
   void _showSettingDialog(BuildContext context) {
     final appState = MyApp.of(context);
+    final FirebaseAuth auth = FirebaseAuth.instance;
+    final User? user = auth.currentUser;
+
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -143,6 +157,16 @@ class _HealthRecorderState extends State<HealthRecorder> {
                     setState(() {});
                   },
                 ),
+                const Divider(),
+                if (user != null)
+                  ListTile(
+                    leading: Icon(Icons.logout),
+                    title: Text(AppLocalizations.of(context).translate('signOut')),
+                    onTap: () async {
+                      await FirebaseAuth.instance.signOut();
+                      Navigator.of(context).pop();
+                    },
+                  ),
               ],
             ),
           ),
@@ -199,6 +223,8 @@ class _HealthRecorderState extends State<HealthRecorder> {
       ),
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _selectedIndex,
+        selectedItemColor: Colors.blue,
+        unselectedItemColor: Colors.grey,
         onTap: (index) {
           setState(() => _selectedIndex = index);
           switch (index) {
@@ -210,6 +236,9 @@ class _HealthRecorderState extends State<HealthRecorder> {
               break;
             case 2:
               context.go('/workout');
+              break;
+            case 3:
+              context.go('/leaderboard');
               break;
           }
         },
@@ -225,6 +254,10 @@ class _HealthRecorderState extends State<HealthRecorder> {
           BottomNavigationBarItem(
               icon: Icon(Icons.fitness_center),
               label: localizations.translate('workoutTab'),
+          ),
+          BottomNavigationBarItem(
+              icon: Icon(Icons.leaderboard),
+              label: localizations.translate('leaderboardTab'),
           ),
         ],
       ),
