@@ -1,3 +1,5 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
@@ -56,6 +58,7 @@ class RecordingState extends ChangeNotifier {
   int recordActivity(String activity) {
     lastRecordingActivity = activity;
     int ptsEarned = _calculatePoints();
+    syncPointsWithFirestore();
     notifyListeners();
     return ptsEarned;
   }
@@ -74,6 +77,32 @@ class RecordingState extends ChangeNotifier {
     }
     lastRecordingTime = now;
     return ptsEarned;
+  }
+
+  Future<void> syncPointsWithFirestore() async {
+    var user = FirebaseAuth.instance.currentUser;
+    if (user != null) {
+      var usersCollection = FirebaseFirestore.instance.collection('users');
+      var docRef = usersCollection.doc(user.uid);
+
+      var doc = await docRef.get();
+      if (doc.exists) {
+        int currentPoints = doc.data()?['points'] ?? 0;
+        if (recordingPoints > currentPoints) {
+          await docRef.update({
+            'points': recordingPoints,
+          });
+        } else {
+          recordingPoints = currentPoints;
+          notifyListeners();
+        }
+      } else {
+        await docRef.set({
+          'username': "user_${Random().nextInt(9999)}",
+          'points': recordingPoints,
+        });
+      }
+    }
   }
 }
 
