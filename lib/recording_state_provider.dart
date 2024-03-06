@@ -1,4 +1,4 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:cloud_functions/cloud_functions.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -53,12 +53,19 @@ class RecordingState extends ChangeNotifier {
 
   void deductPoints(int points) {
     updatePointsAndLastActivity();
+
+    int pointsToDeduct = -1 * points;
+    var user = FirebaseAuth.instance.currentUser;
+    if (user != null) {
+      print('Deducting ${pointsToDeduct} points from user');
+      updateUserPoints(pointsToDeduct);
+    }
   }
 
   int recordActivity(String activity) {
     lastRecordingActivity = activity;
     int ptsEarned = _calculatePoints();
-    syncPointsWithFirestore();
+    updateUserPoints(ptsEarned);
     notifyListeners();
     return ptsEarned;
   }
@@ -79,28 +86,31 @@ class RecordingState extends ChangeNotifier {
     return ptsEarned;
   }
 
+  Future<void> updateUserPoints(int pts) async {
+    FirebaseFunctions functions = FirebaseFunctions.instance;
+    try {
+      final HttpsCallableResult result = await functions.httpsCallable('updateUserPoints').call({
+        'points': pts,
+      });
+      print("Function result: ${result.data}");
+    } catch (e) {
+      print("Error calling function: $e");
+    }
+  }
+
   Future<void> syncPointsWithFirestore() async {
     var user = FirebaseAuth.instance.currentUser;
     if (user != null) {
-      var usersCollection = FirebaseFirestore.instance.collection('users');
-      var docRef = usersCollection.doc(user.uid);
-
-      var doc = await docRef.get();
-      if (doc.exists) {
-        int currentPoints = doc.data()?['points'] ?? 0;
-        if (recordingPoints > currentPoints) {
-          await docRef.update({
-            'points': recordingPoints,
-          });
-        } else {
-          recordingPoints = currentPoints;
-          notifyListeners();
-        }
-      } else {
-        await docRef.set({
-          'username': "user_${Random().nextInt(9999)}",
+      FirebaseFunctions functions = FirebaseFunctions.instance;
+      try {
+        final HttpsCallable callable = functions.httpsCallable('syncUserPoints');
+        final HttpsCallableResult result = await callable.call({
           'points': recordingPoints,
         });
+        recordingPoints = result.data['points'];
+        print("Synced points: $recordingPoints");
+      } catch (e) {
+        print("Error calling function: $e");
       }
     }
   }
