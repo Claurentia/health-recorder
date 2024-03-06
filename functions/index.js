@@ -58,3 +58,26 @@ exports.updateUserPoints = functions.https.onCall(async (data, context) => {
 
   return {success: true, message: "Points updated"};
 });
+
+exports.deleteUserData = functions.https.onCall(async (data, context) => {
+  if (!context.auth) {
+    throw new functions.https.HttpsError("unauthenticated", "Invalid cred");
+  }
+
+  const userId = context.auth.uid;
+
+  const userDocRef = admin.firestore().collection("users").doc(userId);
+
+  try {
+    await userDocRef.delete();
+    console.log(`Deleted user document for UID: ${userId}`);
+
+    await admin.auth().deleteUser(userId);
+    console.log(`Deleted user from Firebase Auth with UID: ${userId}`);
+
+    return {message: "User and related data successfully deleted."};
+  } catch (error) {
+    console.error("Error deleting user data:", error);
+    throw new functions.https.HttpsError("internal", "Failed to delete user");
+  }
+});
