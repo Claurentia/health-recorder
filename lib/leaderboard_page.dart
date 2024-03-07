@@ -15,7 +15,14 @@ class LeaderboardPage extends StatefulWidget {
 }
 
 class _LeaderboardPageState extends State<LeaderboardPage> {
+  late Future<List<Map<String, dynamic>>> _leaderboardData;
   bool _acceptedTerms = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _leaderboardData = fetchLeaderboardData();
+  }
 
   Future<void> syncPoints(BuildContext context) async {
     final recordingState = Provider.of<RecordingState>(context, listen: false);
@@ -47,6 +54,7 @@ class _LeaderboardPageState extends State<LeaderboardPage> {
             TextButton(
               child: const Text("Delete"),
               onPressed: () async {
+                Navigator.of(dialogContext).pop();
                 await _deleteAccountAndData(context);
               },
             ),
@@ -68,7 +76,7 @@ class _LeaderboardPageState extends State<LeaderboardPage> {
 
   Widget LeaderboardRank(BuildContext context) {
     return FutureBuilder<List<Map<String, dynamic>>>(
-      future: fetchLeaderboardData(),
+      future: _leaderboardData,
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.done && snapshot.hasData) {
           final leaderboardData = snapshot.data!;
@@ -76,9 +84,22 @@ class _LeaderboardPageState extends State<LeaderboardPage> {
             children: [
               Padding(
                 padding: const EdgeInsets.all(10.0),
-                child: Text(
-                  'Leaderboard',
-                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    const Text(
+                      'Leaderboard',
+                      style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                    ),
+                    IconButton(
+                      icon: Icon(Icons.refresh),
+                      onPressed: () {
+                        setState(() {
+                          _leaderboardData = fetchLeaderboardData();
+                        });
+                      },
+                    ),
+                  ],
                 ),
               ),
               Expanded(

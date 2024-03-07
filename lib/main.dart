@@ -145,6 +145,7 @@ class _HealthRecorderState extends State<HealthRecorder> {
     final User? user = auth.currentUser;
 
     TextEditingController usernameController = TextEditingController();
+    bool _isUpdating = false;
 
     if (user != null) {
       getUsername(user.uid).then((username) {
@@ -195,19 +196,32 @@ class _HealthRecorderState extends State<HealthRecorder> {
                     ),
                   ),
                   ElevatedButton(
-                    child: Text(AppLocalizations.of(context).translate('updateUsername')),
-                    onPressed: () async {
+                    child: _isUpdating
+                        ? CircularProgressIndicator(
+                      valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                    )
+                        : Text(AppLocalizations.of(context).translate('updateUsername')),
+                    onPressed: _isUpdating ? null : () async {
+                      setState(() {
+                        _isUpdating = true;
+                      });
                       await updateUsername(usernameController.text);
+                      setState(() {
+                        _isUpdating = false;
+                      });
                       Navigator.of(context).pop();
                     },
+                    style: ElevatedButton.styleFrom(
+                      minimumSize: Size(double.infinity, 40),
+                    ),
                   ),
                   const Divider(),
                   ListTile(
                     leading: Icon(Icons.logout),
                     title: Text(AppLocalizations.of(context).translate('signOut')),
                     onTap: () async {
-                      await FirebaseAuth.instance.signOut();
                       Navigator.of(context).pop();
+                      await FirebaseAuth.instance.signOut();
                     },
                   ),
                 ]
