@@ -1,3 +1,5 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:cloud_functions/cloud_functions.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
@@ -120,10 +122,37 @@ class HealthRecorder extends StatefulWidget {
 class _HealthRecorderState extends State<HealthRecorder> {
   int _selectedIndex = 0;
 
+  Future<String?> getUsername(String uid) async {
+    var doc = await FirebaseFirestore.instance.collection('users').doc(uid).get();
+    return doc.data()?['username'] as String?;
+  }
+
+  Future<void> updateUsername(String newUsername) async {
+    HttpsCallable callable = FirebaseFunctions.instance.httpsCallable('updateUsername');
+    try {
+      final response = await callable.call({
+        'username': newUsername,
+      });
+      print(response.data);
+    } catch (e) {
+      print(e);
+    }
+  }
+
   void _showSettingDialog(BuildContext context) {
     final appState = MyApp.of(context);
     final FirebaseAuth auth = FirebaseAuth.instance;
     final User? user = auth.currentUser;
+
+    TextEditingController usernameController = TextEditingController();
+
+    if (user != null) {
+      getUsername(user.uid).then((username) {
+        if (username != null) {
+          usernameController.text = username;
+        }
+      });
+    }
 
     showDialog(
       context: context,
@@ -158,7 +187,21 @@ class _HealthRecorderState extends State<HealthRecorder> {
                   },
                 ),
                 const Divider(),
-                if (user != null)
+                if (user != null) ...[
+                  TextFormField(
+                    controller: usernameController,
+                    decoration: InputDecoration(
+                      labelText: AppLocalizations.of(context).translate('username'),
+                    ),
+                  ),
+                  ElevatedButton(
+                    child: Text(AppLocalizations.of(context).translate('updateUsername')),
+                    onPressed: () async {
+                      await updateUsername(usernameController.text);
+                      Navigator.of(context).pop();
+                    },
+                  ),
+                  const Divider(),
                   ListTile(
                     leading: Icon(Icons.logout),
                     title: Text(AppLocalizations.of(context).translate('signOut')),
@@ -167,6 +210,7 @@ class _HealthRecorderState extends State<HealthRecorder> {
                       Navigator.of(context).pop();
                     },
                   ),
+                ]
               ],
             ),
           ),

@@ -81,3 +81,22 @@ exports.deleteUserData = functions.https.onCall(async (data, context) => {
     throw new functions.https.HttpsError("internal", "Failed to delete user");
   }
 });
+
+exports.updateUsername = functions.https.onCall(async (data, context) => {
+  if (!context.auth) {
+    throw new functions.https.HttpsError("unauthenticated", "Invalid cred");
+  }
+
+  const uid = context.auth.uid;
+  const newUsername = data.username;
+
+  try {
+    await admin.firestore().collection("users").doc(uid).update({
+      username: newUsername,
+    });
+    return {success: true, message: "Username updated successfully."};
+  } catch (error) {
+    console.error("Error updating username:", error);
+    throw new functions.https.HttpsError("internal", "Fail to update username");
+  }
+});

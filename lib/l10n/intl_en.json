@@ -61,5 +61,8 @@
 
   "chooseTheme": "Choose Theme",
 
-  "leaderboardTab": "Leaderboard"
+  "leaderboardTab": "Leaderboard",
+  "updateUsername": "Update Username",
+  "username": "Username",
+  "signOut": "Sign Out"
 }

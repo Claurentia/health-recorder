@@ -60,5 +60,8 @@
   "id": "Bahasa Indonesia",
 
   "chooseStyle": "Pilih Tema",
-  "leaderboardTab": "Peringkat"
+  "leaderboardTab": "Peringkat",
+  "updateUsername": "Ubah Alias",
+  "username": "Alias",
+  "signOut": "Keluar"
 }
